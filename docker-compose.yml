@@ -1,0 +1,25 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    container_name: hora_extra-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: "userHoraExtra"
+      POSTGRES_PASSWORD: "B4c0nC4n4d3n53Ru5504u5tr14c0lu50"
+      POSTGRES_DB: "hora_extra"
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      - ./.docker/database/init:/docker-entrypoint-initdb.d
+    networks:
+      - hora_extra-network
+    
+networks:
+  hora_extra-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
