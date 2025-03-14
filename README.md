@@ -97,3 +97,34 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+## Arquitetura de pastas
+```bash
+src/
+├── core/                   # Camada de Domínio (Core Domain)
+│   ├── domain/            
+│   │   ├── models/        # Entidades (User, Product...)
+│   │   ├── valueObjects/  # Objetos de Valor (Email, Password...)
+│   │   ├── services/      # Serviços de Domínio (interfaces)
+│   │   ├── repositories/  # Interfaces de Repositórios (IUserRepository)
+│   │   └── exceptions/    # Exceções de Domínio (DomainException)
+│   │
+│   └── application/       # Camada de Aplicação
+│       ├── useCases/      # Casos de Uso (CreateUserUseCase)
+│       ├── dtos/          # Objetos de Transferência (CreateUserDTO)
+│       └── services/      # Serviços de Aplicação (UserService)
+│
+├── infra/                 # Camada de Infraestrutura
+│   ├── encryption/        # Implementação de Criptografia (AES, bcrypt)
+│   ├── repositories/      # Implementações de Repositórios (UserRepository - SQL/NoSQL)
+│   ├── http/              # Clientes HTTP, Middlewares
+│   └── config/            # Configurações (banco de dados, chaves)
+│
+├── shared/                # Utilitários Compartilhados
+│   ├── utils/             # Funções auxiliares (validation, formatters)
+│   └── types/             # Tipos globais (CustomResponse, RequestContext)
+│
+└── tests/                 # Testes Automatizados
+    ├── unit/              # Testes Unitários
+    └── integration/  
+```
