@@ -1,6 +1,6 @@
 import { 
     Entity,
-    PrimaryColumn,
+    PrimaryGeneratedColumn,
     Column,
     OneToOne,
     JoinColumn,
@@ -12,7 +12,7 @@ import { Event } from './event.schema';
 @Entity()
 export class Area {
   //typeorm
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column({ type: 'varchar', length: 255 })

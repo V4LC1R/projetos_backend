@@ -1,8 +1,8 @@
-import { BcryptService } from "./bcrypt.service";
+import { BcryptHash } from "./bcrypt.hash";
 
 describe('Encript Services test', () => {
     const plainText = 'random-text-transform';
-    const bcryptService = new BcryptService();
+    const bcryptService = new BcryptHash();
     it('should be hashing text',async ()=> {
         const hashedText = await bcryptService.encript(plainText);
         expect(hashedText).not.toBe(plainText);

@@ -1,6 +1,6 @@
 import { 
     Entity,
-    PrimaryColumn,
+    PrimaryGeneratedColumn,
     Column, 
     OneToMany
 } from 'typeorm';
@@ -9,7 +9,7 @@ import { Event } from './event.schema';
 @Entity()
 export class User {
   //typeorm
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column({ type: 'varchar', length: 255 })

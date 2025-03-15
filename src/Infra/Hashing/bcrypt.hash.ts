@@ -1,7 +1,7 @@
 import { IEncriptService } from "src/Core/Domains/Services/encript.service";
 import * as bcrypt from 'bcrypt';
 
-export class BcryptService  implements IEncriptService {
+export class BcryptHash  implements IEncriptService {
     async encript(password: string): Promise<string> {
         return await bcrypt.hash(password, 10);
     }

@@ -110,7 +110,6 @@ src/
 │   │   └── exceptions/    # Exceções de Domínio (DomainException)
 │   │
 │   └── application/       # Camada de Aplicação
-│       ├── useCases/      # Casos de Uso (CreateUserUseCase)
 │       ├── dtos/          # Objetos de Transferência (CreateUserDTO)
 │       └── services/      # Serviços de Aplicação (UserService)
 │

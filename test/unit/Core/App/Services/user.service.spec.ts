@@ -1,6 +1,6 @@
-import { BcryptService } from 'src/Infra/Hashing/bcrypt.service';
+import { BcryptService } from 'src/Infra/Hashing/bcrypt.hash';
 import { UserService } from './../../../../../src/Core/App/Services/user.service';
-import { CreateUserRepository } from 'src/Infra/Database/Repositories/user.repository';
+import { CreateUserRepository } from 'src/Infra/Database/Repositories/user.repository-typeorm';
 import { User } from 'src/Core/Domains/Models/user.model';
 import { CreateUserInputDTO } from 'src/Core/App/DTO/create-user.input.dto';
 describe("User Service test", ()=>{

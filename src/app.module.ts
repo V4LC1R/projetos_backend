@@ -14,8 +14,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         username: config.get('DB_USERNAME'),
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_NAME'),
-        entities: [__dirname + '/Infra/Database/Schemas/*.schemas{.ts,.js}'],
-        migrations: [__dirname + '/Infra/Database/Migrations/*-migrations{.ts,.js}'],
+        entities: [__dirname + '/Infra/Database/Schemas/*.schema{.ts,.js}'],
+        migrations: [__dirname + '/Infra/Database/Migrations/*-migration{.ts,.js}'],
         synchronize: false,
         autoLoadEntities:true
       }),

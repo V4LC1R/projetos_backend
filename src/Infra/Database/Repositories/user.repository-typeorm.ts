@@ -3,7 +3,7 @@ import { IUserRepository } from '../../../Core/Domains/Repositories/user.reposit
 import { Repository } from 'typeorm';
 import { User } from '../Schemas/user.schema';
 
-export class CreateUserRepository implements IUserRepository {
+export class UserRepositoryTypeORM implements IUserRepository {
     constructor(
         private ormRepo:Repository<User>
     ){}
