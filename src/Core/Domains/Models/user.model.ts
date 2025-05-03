@@ -7,6 +7,7 @@ export class UserModel{
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
+    token?: string;
 
     constructor(name: string, email: string, password: string, id?: number, cellphone?: string){
         this.id = id;
@@ -14,5 +15,9 @@ export class UserModel{
         this.email = email;
         this.password = password;
         this.cellphone = cellphone;
+    }
+
+    setToken(token: string){
+        this.token = token;
     }
 }

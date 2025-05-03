@@ -1,4 +1,4 @@
-import { BcryptService } from 'src/Infra/Hashing/bcrypt.hash';
+import { BcryptService } from 'src/Infra/Services/bcrypt.service';
 import { UserService } from './../../../../../src/Core/App/Services/user.service';
 import { CreateUserRepository } from 'src/Infra/Database/Repositories/user.repository-typeorm';
 import { User } from 'src/Core/Domains/Models/user.model';

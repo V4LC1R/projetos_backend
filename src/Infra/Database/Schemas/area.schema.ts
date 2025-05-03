@@ -1,3 +1,4 @@
+import { Schedule } from './schedule.schema';
 import { 
     Entity,
     PrimaryGeneratedColumn,
@@ -33,4 +34,7 @@ export class Area {
 
     @OneToMany(() => Event, event => event.area)
     public events: Event[];
+
+    @OneToMany(() => Schedule, event => event.area)
+    public schedule: Schedule[];
 }

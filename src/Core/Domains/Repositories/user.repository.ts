@@ -1,9 +1,7 @@
 import { UserModel } from "../Models/user.model";
+import { IBaseRepository } from "./base.repository";
 
-export interface IUserRepository {
-    create(userData:UserModel):Promise<UserModel>;
-    // update(userData:User):Promise<User>;
-    // delete(id:number):Promise<boolean>;
-    // findById(id:number):Promise<User>;
-    // findByEmail(email:string):Promise<User>;
+export interface IUserRepository extends IBaseRepository<UserModel> {
+    findByEmail(email:string):Promise<UserModel|null>;
+    updatePassword(userId:number,newPassword:string)
 }
