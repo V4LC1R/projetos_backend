@@ -1,17 +1,18 @@
-import { AreaModel } from "src/Core/Domains/Models/area.model";
-import { UserModel } from "src/Core/Domains/Models/user.model";
-
+import { Type } from "class-transformer";
+import { IsDecimal, IsNotEmpty, IsString, ValidateNested } from "class-validator";
+import { CreateAddressInputDto } from "./create-address.input.dto";
 export class CreateAreaInputDto {
+
+    @IsString()
+    @IsNotEmpty()
     name: string;
+
+    @IsDecimal()
+    @IsNotEmpty()
     rent: number;
-    owner_id: number;
 
-    constructor(name: string, rent: number) {
-        this.name = name;
-        this.rent = rent;
-    }
-
-    setIdOwner(id: number) {
-        this.owner_id = id;
-    }
+    @ValidateNested()
+    @IsNotEmpty()
+    @Type(()=>CreateAddressInputDto)
+    address: CreateAddressInputDto
 }

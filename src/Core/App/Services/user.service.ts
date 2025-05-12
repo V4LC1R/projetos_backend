@@ -51,11 +51,15 @@ export class UserService {
             throw new UnauthorizedException("User not found!");
 
         const isValid = await this.encriptService.compare(password, user.password);
-
+       
         if(!isValid) 
             throw new UnauthorizedException();
 
-        const token = await this.tokenService.generate(user);
+        const token = await this.tokenService.generate({
+            name:user.name,
+            email:user.email,
+            id:user.id
+        });
         user.setToken(token);
         return new UserAuthOutput(user.name, user.email, token);
     }

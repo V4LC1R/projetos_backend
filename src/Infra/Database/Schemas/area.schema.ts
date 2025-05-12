@@ -5,10 +5,12 @@ import {
     Column,
     OneToOne,
     JoinColumn,
-    OneToMany
+    OneToMany,
+    ManyToOne
 } from 'typeorm';
 import { User } from './user.schema';
 import { Event } from './event.schema';
+import { Address } from './address.schema';
 
 @Entity()
 export class Area {
@@ -28,13 +30,15 @@ export class Area {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
-    @OneToOne(() => User)
-    @JoinColumn()
+    @ManyToOne(() => User, (user) => user.area)
     owner: User
 
-    @OneToMany(() => Event, event => event.area)
+    @OneToOne(() => Address, (address) => address.area,{ eager: true })
+    public address: Address
+
+    @OneToMany(() => Event, event => event.area,{ eager: true })
     public events: Event[];
 
-    @OneToMany(() => Schedule, event => event.area)
+    @OneToMany(() => Schedule, event => event.area,{ eager: true })
     public schedule: Schedule[];
 }

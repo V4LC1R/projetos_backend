@@ -5,6 +5,7 @@ import {
     OneToMany
 } from 'typeorm';
 import { Event } from './event.schema';
+import { Area } from './area.schema';
 
 @Entity()
 export class User {
@@ -32,4 +33,7 @@ export class User {
 
     @OneToMany(() => Event, event => event.owner)
     public events: Event[];
+
+    @OneToMany(() => Area, area => area.owner)
+    public area: Area[];
 }

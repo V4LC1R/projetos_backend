@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Post, Put, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Request } from '@nestjs/common';
 import { CreateAreaInputDto } from 'src/Api/DTO/create-area.input.dto';
 import { AreaService } from 'src/Core/App/Services/area.service';
+import { AreaRepositoryTypeORM } from 'src/Infra/Database/Repositories/area.repository-typeorm';
 
 import { HTTPErrorFactory } from 'src/Infra/Helper/HTTPErrorFactory';
 
@@ -12,32 +13,41 @@ export class AreaController {
     ){}
 
     @Post('/')
-    async store(@Body() areaDto:CreateAreaInputDto){
-        
-       try {
-            return await this.areaService
-                .create(areaDto);
-       } catch (error) {
+    async store(@Request() req, @Body() areaDto:CreateAreaInputDto){
+        try {
+            return await this
+                .areaService
+                .create(req.user.id,areaDto);
+        } catch (error) {
+            console.log(error)
             throw HTTPErrorFactory
                 .INTERNAL_SERVER_ERROR('Error to create area', error)
         }
     }
 
-    // @Get('/:id')
-    // async getAreaById() {
-    //     // Logic to get an Area by ID
-    //     return { message: 'Area details' };
-    // }
-    // @Put('/')
-    // async updateArea() {
-    //     // Logic to update an Area
-    //     return { message: 'Area updated successfully' };
-    // }
+    @Get('/my-areas')
+    async getByOwner(@Request() req){
+        try{
+            return await this
+                .areaService
+                .getAllByOwner(req.user.id);
+        }catch(error){
+            console.log(error)
+            throw HTTPErrorFactory
+                .INTERNAL_SERVER_ERROR('Error to get areas', error)
+        }
+    }
 
-    // @Delete('/')
-    // async deleteArea() {
-    //     // Logic to delete an Area
-    //     return { message: 'Area deleted successfully' };
-    // }
+    @Get('/by-position')
+    async getByPosition(@Param() param){
+        try{
+            return await this
+                .areaService
+                .getByPosition(param.lat, param.lng, param.distance);
+        }catch(error){
+            throw HTTPErrorFactory
+                .INTERNAL_SERVER_ERROR('Error to get areas', error)
+        }
+    }
 
 }

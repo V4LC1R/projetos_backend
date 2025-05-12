@@ -1,8 +1,6 @@
+import { IsNotEmpty,NotContains } from "class-validator";
+
 export class UpdatePasswordInputDTO  {
-    userId:number;
+    @IsNotEmpty()
     password: string;
-    constructor(userId:number, password: string) {
-        this.userId = userId;
-        this.password = password;
-    }
 }

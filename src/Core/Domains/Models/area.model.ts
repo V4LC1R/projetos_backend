@@ -1,3 +1,4 @@
+import { AddressModel } from "./address.model";
 import { UserModel } from "./user.model";
 
 export class AreaModel {
@@ -6,7 +7,8 @@ export class AreaModel {
     rent: number;
     createdAt: Date;
     updatedAt: Date;
-    owner: UserModel
+    owner: UserModel;
+    address?:AddressModel
 
     constructor(name: string, rent: number, createdAt: Date, updatedAt: Date, id?: number) {
         this.name = name;
@@ -23,5 +25,25 @@ export class AreaModel {
             owner.password ?? '',
             owner.id ?? 0
         );
+
+        return this
+    }
+
+    setAddress(address: Partial<AddressModel>){
+        this.address = new AddressModel(
+            address.number_place ?? "",
+            address.district ?? "",
+            address.country ?? "",
+            address.street ?? "",
+            address.city ?? "",
+            address.state ?? "",
+            address.complement ?? "",
+            address.latitude ?? "",
+            address.longitude ?? "",
+            address.areaId ?? 0,
+            address.id ?? 0
+        )
+
+        return this
     }
 }

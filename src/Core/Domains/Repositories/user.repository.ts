@@ -3,5 +3,5 @@ import { IBaseRepository } from "./base.repository";
 
 export interface IUserRepository extends IBaseRepository<UserModel> {
     findByEmail(email:string):Promise<UserModel|null>;
-    updatePassword(userId:number,newPassword:string)
+    updatePassword(userId:number,newPassword:string):Promise<UserModel|null>;
 }

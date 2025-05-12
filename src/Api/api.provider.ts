@@ -1,4 +1,3 @@
-import { ConfigService } from "@nestjs/config";
 import { getDataSourceToken } from "@nestjs/typeorm";
 //interfaces
 import { IUserRepository } from "src/Core/Domains/Repositories/user.repository";
@@ -22,6 +21,10 @@ import { UserRepositoryTypeORM } from "src/Infra/Database/Repositories/user.repo
 import { UserService } from "src/Core/App/Services/user.service";
 import { AreaService } from "src/Core/App/Services/area.service";
 
+import { AddressRepositoryTypeORM } from "src/Infra/Database/Repositories/address.repository-typeorm";
+import { AddressService } from "src/Core/App/Services/address.service";
+import { Address } from "src/Infra/Database/Schemas/address.schema";
+
 const controllers = [
     AuthController,
     EventController,
@@ -34,11 +37,8 @@ const infraServices = [
         useClass: BcryptHash,
     },
     {
-        inject:[ConfigService],
         provide:JSONWebToken,
-        useFactory:(config:ConfigService)=>{
-            return new JSONWebToken(config)
-        }
+        useClass:JSONWebToken,
     }
 ]
 
@@ -51,22 +51,38 @@ const coreServices = [
         }
     },
     {
-        inject:[AreaRepositoryTypeORM],
+        inject:[AddressRepositoryTypeORM],
+        provide:AddressService,
+        useFactory:(addressRepo:AddressRepositoryTypeORM)=>{
+            return new AddressService(addressRepo)
+        }
+    },
+    {
+        inject:[AreaRepositoryTypeORM,AddressService],
         provide:AreaService,
-        useFactory:(areaRepo:AreaRepositoryTypeORM)=>{
-            return new AreaService(areaRepo)
+        useFactory:(areaRepo:AreaRepositoryTypeORM,addressService:AddressService)=>{
+            return new AreaService(areaRepo,addressService)
         }
     }
 ]
 
 const repositories = [
-     {
+    {
       inject:[getDataSourceToken(),UserRepositoryTypeORM],
       provide:AreaRepositoryTypeORM,
       useFactory:(dataSource:DataSource,userRepo:UserRepositoryTypeORM)=>{
         return new AreaRepositoryTypeORM(
           dataSource.getRepository(Area),
           userRepo
+        )
+      }
+    },
+    {
+      inject:[getDataSourceToken()],
+      provide:AddressRepositoryTypeORM,
+      useFactory:(dataSource:DataSource)=>{
+        return new AddressRepositoryTypeORM(
+          dataSource.getRepository(Address),
         )
       }
     },
@@ -82,6 +98,7 @@ const repositories = [
 ]
 
 export const APIProvider = {
+   
     services:[
         ...coreServices,
         ...infraServices,

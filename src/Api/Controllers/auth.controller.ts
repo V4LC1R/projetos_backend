@@ -1,8 +1,9 @@
-import { Body, Controller, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Param, Post, Put, Req } from '@nestjs/common';
 import { AuthUserInputDTO } from 'src/Api/DTO/auth-user.input.dto';
 import { CreateUserInputDTO } from 'src/Api/DTO/create-user.input.dto';
 import { UpdatePasswordInputDTO } from 'src/Api/DTO/update-password.input.dtp';
 import { UserService } from 'src/Core/App/Services/user.service';
+import { Exception } from 'src/Core/Shared/Exceptions';
 
 import { HTTPErrorFactory } from 'src/Infra/Helper/HTTPErrorFactory';
 
@@ -19,6 +20,7 @@ export class AuthController {
                 .userService
                 .authenticate(credentials.email,credentials.password);
         } catch (error) {
+            console.log(error)
             throw HTTPErrorFactory
                 .UNAUTHORIZED('User UNAUTHORIZED',error)
         }
@@ -30,18 +32,20 @@ export class AuthController {
             return await this
                 .userService
                 .create(createUserDto);
-        } catch (error) {
-            throw HTTPErrorFactory
+        } catch (error:Exception | any) {
+             throw HTTPErrorFactory
                 .INTERNAL_SERVER_ERROR('Error to create user', error)
         }
     }
 
     @Put('/change-password')
-    async changePassword(@Body() data:UpdatePasswordInputDTO){
+    async changePassword(@Req() req, @Body() data:UpdatePasswordInputDTO){
         try {
+
+            console.log(req.user,data)
             return await this
                 .userService
-                .changePassword(data.userId, data.password);
+                .changePassword(req.user.id, data.password);
         } catch (error) {
             throw HTTPErrorFactory
                 .INTERNAL_SERVER_ERROR('Error to change password', error)

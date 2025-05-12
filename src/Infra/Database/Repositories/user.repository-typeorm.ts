@@ -15,8 +15,8 @@ export class UserRepositoryTypeORM implements IUserRepository {
         if(!user)
             return null;
 
-        const {name,id, email,password} = user;
-        return new UserModel(name,email,password,id)
+        const {name,id, email,password,cellphone} = user;
+        return new UserModel(name,email,password,id,cellphone)
     }
 
     async create(data:UserModel):Promise<UserModel>{

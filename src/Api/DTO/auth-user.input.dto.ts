@@ -1,8 +1,11 @@
-export class AuthUserInputDTO  {
+import { IsEmail, IsNotEmpty } from "class-validator";
+
+export class AuthUserInputDTO
+{
+    @IsNotEmpty()
+    @IsEmail()
     email: string;
+
+    @IsNotEmpty()
     password: string;
-    constructor(name: string, email: string, password: string) {
-        this.email = email;
-        this.password = password;
-    }
 }
