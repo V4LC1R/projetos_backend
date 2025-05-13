@@ -22,18 +22,14 @@ export class AreaService {
         if(!area.id)
             throw new Error('Something went wrong on creating area');
 
-        this.addressService.create(area.id,areaData.address)
+        await this.addressService.create(area.id,areaData.address)
         return area;
     }
 
     async getAllByOwner(ownerId: number) {
         const areas = await this.areaRepo.findByOwnerId(ownerId);
         
-        console.log(areas)
-
-        return areas.map((area) => {
-            return new AreaCreateOutput(area,area.address ?? {} as AddressModel);
-        });
+        return areas;
     }
 
     async getByPosition(lat:number, lng:number, distance:number) {

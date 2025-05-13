@@ -1,5 +1,5 @@
 
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { Area } from '../Schemas/area.schema';
 import { IAreaRepository } from 'src/Core/Domains/Repositories/area.repository';
 import { AreaModel } from 'src/Core/Domains/Models/area.model';
@@ -61,18 +61,16 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
     }
 
     async findByOwnerId(ownerId: number): Promise<AreaModel[]> {
-        const areas = await this.ormRepo.find(
-            {
-                relations:['address'],
-                where:{owner:{id: ownerId}}
-            }
-        );
 
-        console.log(areas)
+        const areas = await this.ormRepo.find({
+            relations: { address: true },
+            where: { owner:{id:ownerId},address: { id: Not(IsNull()) } }
+        });
+
         const owner = await this.userRepo.findById(ownerId)
 
         return areas.map(area =>{
-            const MyArea = new AreaModel(
+            return new AreaModel(
                 area.name,
                 area.rent, 
                 area.createdAt,
@@ -80,18 +78,8 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
                 area.id
             ) 
             .setOwner(owner ?? {})
-
-            if(area.address){
-                area.address.area = area
-                MyArea.setAddress(area.address)
-            }
-                
-
-            return MyArea
-           
-        }
-           
-        )
+            .setAddress(area.address)
+        })
         
     }
 

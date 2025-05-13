@@ -9,7 +9,7 @@ export class AddressRepositoryTypeORM implements IAddressRepository {
         private ormRepo:Repository<Address>
     ){}
 
-    async create(data:{address:AddressModel,area:AreaModel}):Promise<any>{
+    async create(data:{address:AddressModel,area:AreaModel}):Promise<AddressModel>{
         const model = this.ormRepo.create({...data.address,area:data.area}); 
         
         const address =  await this.ormRepo.save(model);

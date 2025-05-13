@@ -22,7 +22,7 @@ export class AreaModel {
         this.owner = new UserModel(
             owner.name ?? '',
             owner.email ?? '',
-            owner.password ?? '',
+            '',
             owner.id ?? 0
         );
 
