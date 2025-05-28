@@ -1,8 +1,8 @@
-import { Address } from './../Schemas/address.schema';
-import { Repository } from 'typeorm';
 import { IAddressRepository } from 'src/Core/Domains/Repositories/address.repository';
-import { AddressModel } from 'src/Core/Domains/Models/address.model';
-import { AreaModel } from 'src/Core/Domains/Models/area.model';
+import { Repository } from 'typeorm';
+import { Address } from '../Schemas/address.schema';
+import { AreaModel } from '@domain/Models/area.model';
+import { AddressModel } from '@domain/Models/address.model';
 
 export class AddressRepositoryTypeORM implements IAddressRepository {
     constructor(

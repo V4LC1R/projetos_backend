@@ -1,11 +1,12 @@
 import { Body, Controller, Param, Post, Put, Req } from '@nestjs/common';
-import { AuthUserInputDTO } from 'src/Api/DTO/auth-user.input.dto';
-import { CreateUserInputDTO } from 'src/Api/DTO/create-user.input.dto';
-import { UpdatePasswordInputDTO } from 'src/Api/DTO/update-password.input.dtp';
-import { UserService } from 'src/Core/App/Services/user.service';
-import { Exception } from 'src/Core/Shared/Exceptions';
 
-import { HTTPErrorFactory } from 'src/Infra/Helper/HTTPErrorFactory';
+import { AuthUserInputDTO } from '@api/DTO/auth-user.input.dto';
+import { CreateUserInputDTO } from '@api/DTO/create-user.input.dto';
+import { UpdatePasswordInputDTO } from '@api/DTO/update-password.input.dtp';
+import { UserService } from '@app/Services/user.service';
+import { Exception } from '@shared/Exceptions';
+import { HTTPErrorFactory } from '@infra/Helper/HTTPErrorFactory';
+
 
 @Controller('auth')
 export class AuthController {

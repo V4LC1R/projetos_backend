@@ -1,6 +1,7 @@
+import { CreateAreaInputDto } from '@api/DTO/create-area.input.dto';
+import { AreaService } from '@app/Services/area.service';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request } from '@nestjs/common';
-import { CreateAreaInputDto } from 'src/Api/DTO/create-area.input.dto';
-import { AreaService } from 'src/Core/App/Services/area.service';
+
 
 import { HTTPErrorFactory } from 'src/Infra/Helper/HTTPErrorFactory';
 

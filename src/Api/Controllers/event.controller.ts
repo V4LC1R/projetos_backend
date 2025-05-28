@@ -1,7 +1,8 @@
+import { CreateEventInputDTO } from '@api/DTO/create-event.input.dto';
+import { EventAreaService } from '@app/Services/event.service';
+import { HTTPErrorFactory } from '@infra/Helper/HTTPErrorFactory';
 import { Body, Controller, Delete, Get, Post, Put, Req } from '@nestjs/common';
-import { EventAreaService } from 'src/Core/App/Services/event.service';
-import { CreateEventInputDTO } from '../DTO/create-event.input.dto';
-import { HTTPErrorFactory } from 'src/Infra/Helper/HTTPErrorFactory';
+
 
 @Controller('event')
 export class EventController {

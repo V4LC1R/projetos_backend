@@ -1,7 +1,4 @@
 import { getDataSourceToken } from "@nestjs/typeorm";
-//interfaces
-import { IUserRepository } from "src/Core/Domains/Repositories/user.repository";
-import { IEncriptService } from "src/Core/Domains/Services/encript.service";
 //schemas
 import { Area } from "src/Infra/Database/Schemas/area.schema";
 import { User } from "src/Infra/Database/Schemas/user.schema";

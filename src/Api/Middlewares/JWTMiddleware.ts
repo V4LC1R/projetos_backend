@@ -1,7 +1,7 @@
-import { JSONWebToken } from "src/Infra/Services/jsonWebToken.service";
+import { JSONWebToken } from '@infra/Services/jsonWebToken.service';
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { UserModel } from "src/Core/Domains/Models/user.model";
+import { UserModel } from 'src/Core/Domains/Models/user.model';
 
 interface AuthRequest extends Request {
     user?: UserModel

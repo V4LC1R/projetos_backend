@@ -1,10 +1,11 @@
 
 import { IsNull, Not, Repository } from 'typeorm';
-import { Area } from '../Schemas/area.schema';
-import { IAreaRepository } from 'src/Core/Domains/Repositories/area.repository';
-import { AreaModel } from 'src/Core/Domains/Models/area.model';
-import { IUserRepository } from 'src/Core/Domains/Repositories/user.repository';
 import { Address } from '../Schemas/address.schema';
+import { IAreaRepository } from '@domain/Repositories/area.repository';
+import { Area } from '../Schemas/area.schema';
+import { IUserRepository } from '@domain/Repositories/user.repository';
+import { AreaModel } from '@domain/Models/area.model';
+
 
 interface AreaWithAddress extends Omit<Area , "address">,Omit<Address , "id">{}
 export class AreaRepositoryTypeORM implements IAreaRepository {
