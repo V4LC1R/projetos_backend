@@ -24,6 +24,9 @@ import { AreaService } from "src/Core/App/Services/area.service";
 import { AddressRepositoryTypeORM } from "src/Infra/Database/Repositories/address.repository-typeorm";
 import { AddressService } from "src/Core/App/Services/address.service";
 import { Address } from "src/Infra/Database/Schemas/address.schema";
+import { EventRepositoryTypeORM } from "src/Infra/Database/Repositories/event.repository-typeorm";
+import { Event } from "src/Infra/Database/Schemas/event.schema";
+import { EventAreaService } from "src/Core/App/Services/event.service";
 
 const controllers = [
     AuthController,
@@ -46,7 +49,7 @@ const coreServices = [
     {
         inject:[UserRepositoryTypeORM,BcryptHash,JSONWebToken],
         provide:UserService,
-        useFactory:(repo:IUserRepository,hash:IEncriptService,token:JSONWebToken)=>{
+        useFactory:(repo:UserRepositoryTypeORM,hash:BcryptHash,token:JSONWebToken)=>{
             return new UserService(repo,hash,token)
         }
     },
@@ -55,6 +58,13 @@ const coreServices = [
         provide:AddressService,
         useFactory:(addressRepo:AddressRepositoryTypeORM)=>{
             return new AddressService(addressRepo)
+        }
+    },
+    {
+        inject:[EventRepositoryTypeORM,AreaRepositoryTypeORM,UserRepositoryTypeORM],
+        provide:EventAreaService,
+        useFactory:(eventRepo:EventRepositoryTypeORM,areaRepo:AreaRepositoryTypeORM,userRepo:UserRepositoryTypeORM)=>{
+            return new EventAreaService(eventRepo,areaRepo,userRepo)
         }
     },
     {
@@ -83,6 +93,15 @@ const repositories = [
       useFactory:(dataSource:DataSource)=>{
         return new AddressRepositoryTypeORM(
           dataSource.getRepository(Address),
+        )
+      }
+    },
+    {
+      inject:[getDataSourceToken()],
+      provide:EventRepositoryTypeORM,
+      useFactory:(dataSource:DataSource)=>{
+        return new EventRepositoryTypeORM(
+          dataSource.getRepository(Event),
         )
       }
     },

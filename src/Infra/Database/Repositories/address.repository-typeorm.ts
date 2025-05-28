@@ -28,12 +28,12 @@ export class AddressRepositoryTypeORM implements IAddressRepository {
         )
     }  
     
-    async update(data:AddressModel):Promise<AddressModel>{
-        await this.ormRepo.update({id:data.id},data);
+    async update(id:number,data:AddressModel):Promise<AddressModel>{
+        await this.ormRepo.update({id:id},data);
         if(!data.id)
             throw new Error("address not found");
 
-        const address = await this.findById(data.id);
+        const address = await this.findById(id);
         if(!address) 
             throw new Error("address not found");
 

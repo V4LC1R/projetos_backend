@@ -1,7 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request } from '@nestjs/common';
 import { CreateAreaInputDto } from 'src/Api/DTO/create-area.input.dto';
 import { AreaService } from 'src/Core/App/Services/area.service';
-import { AreaRepositoryTypeORM } from 'src/Infra/Database/Repositories/area.repository-typeorm';
 
 import { HTTPErrorFactory } from 'src/Infra/Helper/HTTPErrorFactory';
 
@@ -25,6 +24,32 @@ export class AreaController {
         }
     }
 
+    @Put('/')
+    async update(@Param('id') id, @Request() req, @Body() areaDto:CreateAreaInputDto){
+        try {
+            return await this
+                .areaService
+                .edit(id,req.user.id,areaDto);
+        } catch (error) {
+            console.log(error)
+            throw HTTPErrorFactory
+                .INTERNAL_SERVER_ERROR('Error to create area', error)
+        }
+    }
+
+    @Get('/')
+    async show(@Param('id') id){
+        try{
+            return await this
+                .areaService
+                .getById(id);
+        }catch(error){
+            console.log(error)
+            throw HTTPErrorFactory
+                .INTERNAL_SERVER_ERROR('Error to get areas', error)
+        }
+    }
+
     @Get('/my-areas')
     async getByOwner(@Request() req){
         try{
@@ -39,11 +64,11 @@ export class AreaController {
     }
 
     @Get('/by-position')
-    async getByPosition(@Param() param){
+    async getByPosition(@Query("lat") lat,@Query("lng") lng, @Query("distance") distance){
         try{
             return await this
                 .areaService
-                .getByPosition(param.lat, param.lng, param.distance);
+                .getByPosition(lat, lng, distance);
         }catch(error){
             throw HTTPErrorFactory
                 .INTERNAL_SERVER_ERROR('Error to get areas', error)

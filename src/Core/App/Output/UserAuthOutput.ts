@@ -1,8 +1,10 @@
 export class UserAuthOutput  {
+    name:string
     email: string;
-    password: string;
-    constructor(name: string, email: string, password: string) {
+    token: string;
+    constructor(name: string, email: string, token: string) {
+        this.name = name
         this.email = email;
-        this.password = password;
+        this.token = token;
     }
 }

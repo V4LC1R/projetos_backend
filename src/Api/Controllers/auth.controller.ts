@@ -20,7 +20,6 @@ export class AuthController {
                 .userService
                 .authenticate(credentials.email,credentials.password);
         } catch (error) {
-            console.log(error)
             throw HTTPErrorFactory
                 .UNAUTHORIZED('User UNAUTHORIZED',error)
         }

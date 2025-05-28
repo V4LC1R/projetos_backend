@@ -1,13 +1,6 @@
-import { Address } from './../../../Infra/Database/Schemas/address.schema';
 import { IAreaRepository } from "src/Core/Domains/Repositories/area.repository";
-import { AreaModel } from 'src/Core/Domains/Models/area.model';
 import { AreaCreateInput } from "../Inputs/AreaCreateInput";
-import { AreaCreateOutput } from "../Output/AreaCreateOutput";
 import { AddressService } from "./address.service";
-import { AddressCreateInput } from '../Inputs/AddressCreateInput';
-import { AddressCreateOutput } from '../Output/AddressCreateOutput';
-import { AddressModel } from 'src/Core/Domains/Models/address.model';
-
 
 export class AreaService {
     constructor(
@@ -26,6 +19,17 @@ export class AreaService {
         return area;
     }
 
+    async edit(areaId:number,ownerId:number,areaData:AreaCreateInput){
+
+        const isCorrectOwner = await this.areaRepo.isOwner(ownerId,areaId)
+
+        if(!isCorrectOwner)
+            throw new Error("This user is not owner from this area!");
+
+        const area = await this.areaRepo.update(areaId,areaData)
+        return area
+    }
+
     async getAllByOwner(ownerId: number) {
         const areas = await this.areaRepo.findByOwnerId(ownerId);
         
@@ -35,5 +39,10 @@ export class AreaService {
     async getByPosition(lat:number, lng:number, distance:number) {
         const areas = await this.addressService.getByPosition(lat,lng,distance);
         return areas
+    }
+
+    async getById(areaId:number){
+        const area = await this.getById(areaId);
+        return area
     }
 }

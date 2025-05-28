@@ -1,11 +1,17 @@
-import { Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Put, Req } from '@nestjs/common';
+import { EventAreaService } from 'src/Core/App/Services/event.service';
+import { CreateEventInputDTO } from '../DTO/create-event.input.dto';
+import { HTTPErrorFactory } from 'src/Infra/Helper/HTTPErrorFactory';
 
 @Controller('event')
 export class EventController {
+    constructor(
+            private readonly eventService : EventAreaService
+        ){}
+
     @Get('/')
     async getEvents() {
-        // Logic to get all events
-        return { message: 'List of events' };
+      
     }
 
     @Get('/:id')
@@ -14,10 +20,29 @@ export class EventController {
         return { message: 'Event details' };
     }
 
+    @Get('/my-events/')
+    async getMyEvents() {
+        // Logic to get an event by ID
+        return { message: 'Event details' };
+    }
+
+    @Get('/area-events/:id')
+    async getEventsByArea() {
+        // Logic to get an event by ID
+        return { message: 'Event details' };
+    }
+
     @Post('/')
-    async createEvent() {
-        // Logic to create an event
-        return { message: 'Event created successfully' };
+    async createEvent(@Req() req, @Body() body:CreateEventInputDTO) {
+        try {
+            return await this
+                .eventService
+                .create({...body,ownerId:req.user.id});
+        } catch (error) {
+            console.log(error)
+            throw HTTPErrorFactory
+                 .INTERNAL_SERVER_ERROR('Error to create event', error)
+        }
     }
 
     @Put('/')

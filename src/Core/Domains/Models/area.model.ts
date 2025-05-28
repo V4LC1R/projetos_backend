@@ -1,5 +1,5 @@
 import { AddressModel } from "./address.model";
-import { UserModel } from "./user.model";
+import { OwnerModel } from "./owner.model";
 
 export class AreaModel {
     id?: number;
@@ -7,8 +7,8 @@ export class AreaModel {
     rent: number;
     createdAt: Date;
     updatedAt: Date;
-    owner: UserModel;
-    address?:AddressModel
+    owner: OwnerModel;
+    address:AddressModel
 
     constructor(name: string, rent: number, createdAt: Date, updatedAt: Date, id?: number) {
         this.name = name;
@@ -18,8 +18,8 @@ export class AreaModel {
         this.id = id;
     }
 
-    setOwner(owner: Partial<UserModel>) {
-        this.owner = new UserModel(
+    setOwner(owner: Partial<OwnerModel>) {
+        this.owner = new OwnerModel(
             owner.name ?? '',
             owner.email ?? '',
             '',
@@ -46,4 +46,5 @@ export class AreaModel {
 
         return this
     }
+
 }

@@ -25,12 +25,12 @@ export class UserRepositoryTypeORM implements IUserRepository {
         return new UserModel(user.name, user.email, user.password, user.id);
     }  
     
-    async update(data:UserModel):Promise<UserModel>{
-        await this.ormRepo.update({id:data.id},data);
+    async update(id:number,data:UserModel):Promise<UserModel>{
+        await this.ormRepo.update({id},data);
         if(!data.id)
             throw new Error("User not found");
 
-        const user = await this.findById(data.id);
+        const user = await this.findById(id);
         if(!user) 
             throw new Error("User not found");
 
@@ -46,8 +46,7 @@ export class UserRepositoryTypeORM implements IUserRepository {
         if(!user)
             return null;
 
-        const {name,email,password} = user;
-        return new UserModel(name,email,password,id);
+        return new UserModel(user.name, user.email, user.password, user.id, user.cellphone);
     }
 
     async findAll(): Promise<UserModel[]> {

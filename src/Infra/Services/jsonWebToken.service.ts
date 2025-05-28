@@ -9,7 +9,6 @@ import { ENV } from "../Helper/Env";
 export class JSONWebToken implements ITokenService {
 
     async generate<T extends Record<string,any>> (dataToken:T): Promise<string>{
-        console.log('>>>>>>>>', dataToken)
         return jwt.sign(dataToken, ENV.load("JWT_SECRET_KEY","") ?? "")
     };
 
