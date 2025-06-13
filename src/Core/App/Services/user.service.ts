@@ -59,4 +59,14 @@ export class UserService {
         user.setToken(token);
         return {token,user};
     }
+
+    async selfDelete(userId:number){
+        if(!await this.userRepo.delete(userId))
+            throw new Error("Error in delete your account!")
+
+        return {
+            "message":"User was deleted",
+            "status":"success"
+        }
+    }
 }

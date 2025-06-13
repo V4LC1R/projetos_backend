@@ -2,7 +2,6 @@ import { CreateEventInputDTO } from '@api/DTO/create-event.input.dto';
 import { EventAreaService } from '@app/Services/event.service';
 import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
 
-
 @Controller('event')
 export class EventController {
     constructor(

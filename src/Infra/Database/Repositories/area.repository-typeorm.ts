@@ -40,7 +40,7 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
 
     async findById(id: number): Promise<AreaModel | null> {
         const area = await this.ormRepo.findOne({
-            relations: { address: true,owner: true },
+            relations: { address: true,owner: true,categories:true },
             where:{id,active:ActiveStatusEnum.ACTIVE},
             order:{id:'desc'}
         });
@@ -59,7 +59,7 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
     async findByOwnerId(ownerId: number): Promise<AreaModel[]> {
 
         const areas = await this.ormRepo.find({
-            relations: { address: true,owner:true},
+            relations: { address: true,owner:true,categories:true},
             where: { owner:{id:ownerId} ,active:ActiveStatusEnum.ACTIVE},
             order:{id:'desc'}
         });
@@ -67,35 +67,47 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
         return areas.map(area =>AreaMapper.toDomain(area))
         
     }
-
-    async findByCoordinates<AreaWithAddress>(lat: number, lng: number,distance:number): Promise<AreaWithAddress[]> {;
-        const query = `
-            SELECT 
-                areas.id as area_id,
-                areas.name as area_name,
-                address.id as address_id,
-                address.street,
-                address.latitude,
-                address.longitude,
+    
+    async findByCoordinates(
+        lat: number,
+        lng: number,
+        distance: number,
+        categoryId?:number[]
+    ): Promise<any[]> {
+        const qb = this.ormRepo
+            .createQueryBuilder("areas")
+            .innerJoin("areas.address", "address")
+            .select([
+                "areas.id AS area_id",
+                "areas.name AS area_name",
+                "address.id AS address_id",
+                "address.street AS street",
+                "address.latitude AS latitude",
+                "address.longitude AS longitude",
+            ])
+            .addSelect(`
                 (
                     6371 * acos(
-                        cos(radians(:lat)) * cos(radians(address.latitude)) *
-                        cos(radians(address.longitude) - radians(:lng)) +
-                        sin(radians(:lat)) * sin(radians(address.latitude))
-                    )
-                ) AS distance
-            FROM address
-            RIGHT JOIN areas ON areas.address_id = address.id
-            WHERE area.active = 1
-            HAVING distance < :distance
-            ORDER BY distance
-        `;
-        const address:AreaWithAddress[] = await this
-            .ormRepo
-            .query(query, [ lat, lng ,distance ]);
+                    cos(radians(:lat)) * cos(radians(address.latitude)) *
+                    cos(radians(address.longitude) - radians(:lng)) +
+                    sin(radians(:lat)) * sin(radians(address.latitude))
+                )
+            )
+            `, "distance")
+            .where("areas.active = :active", { active: ActiveStatusEnum.ACTIVE })
+            .having("distance < :distance", { distance })
+            .orderBy("distance", "ASC")
+            .setParameters({ lat, lng });
 
-        return address
+        if (categoryId?.length) {
+            qb.innerJoin("areas.categories", "categories")
+            .andWhere("categories.id IN (:...categoryIds)", { categoryId })
+        }
+
+        const result = await qb.getRawMany();
+        return result;
     }
+
 
     async isOwner(ownerId: number, areaId: number): Promise<boolean> {
         return await this

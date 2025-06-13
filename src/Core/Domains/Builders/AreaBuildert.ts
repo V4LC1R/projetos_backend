@@ -1,6 +1,7 @@
 import { AreaCreateInput } from "@app/Inputs/AreaCreateInput";
 import { AddressModel } from "@domain/Models/address.model";
 import { AreaModel } from "@domain/Models/area.model";
+import { CategoryModel } from "@domain/Models/category.model";
 import { OwnerModel } from "@domain/Models/owner.model";
 import { ScheduleModel } from "@domain/Models/schedule.model";
 
@@ -10,6 +11,7 @@ export class AreaBuilder {
   address: AddressModel;
   schedule: ScheduleModel[] = [];
   owner:OwnerModel
+  categories:CategoryModel[]
 
   public setName(name: string): this {
     this.name = name;
@@ -64,11 +66,18 @@ export class AreaBuilder {
     return this;
   }
 
+  public setCategories(categories:number[]){
+    if(categories.length > 0)
+      this.categories = categories.map(e=> new CategoryModel(e,""))
+    return this
+  }
+
   public build(): AreaModel {
     return new AreaModel(this.name, this.rent,new Date(),new Date())
         .setAddress(this.address)
         .setOwner(this.owner.ownerId)
-        .setSchedule(this.schedule);
+        .setSchedule(this.schedule)
+        .setCategories(this.categories);
   }
 
   static fill(input:AreaCreateInput){

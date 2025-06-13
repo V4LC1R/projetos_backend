@@ -1,4 +1,5 @@
 import { CreateAreaInputDto } from '@api/DTO/create-area.input.dto';
+import { FindByCoordinatesDto } from '@api/DTO/get-areaByCoordinates';
 import { UpdateAreaInputDto } from '@api/DTO/update-area.input.dto';
 import { AreaService } from '@app/Services/area.service';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request } from '@nestjs/common';
@@ -24,6 +25,13 @@ export class AreaController {
             .edit(id,req.user.id,areaDto)
     }
 
+    @Get('/my-areas')
+    async getByOwner(@Request() req){
+        return await this
+            .areaService
+            .getAllByOwner(req.user.id);
+    }
+
     @Get('/:id')
     async show(@Param('id') id){
         return await this
@@ -38,18 +46,11 @@ export class AreaController {
             .delete(id,req.user.id);
     }
 
-    @Get('/my-areas')
-    async getByOwner(@Request() req){
-        return await this
-            .areaService
-            .getAllByOwner(req.user.id);
-    }
-
     @Get('/by-position')
-    async getByPosition(@Query("lat") lat,@Query("lng") lng, @Query("distance") distance, @Query("search") textSearch:string){
+    async getByPosition(@Query() query: FindByCoordinatesDto){
         return await this
             .areaService
-            .getByPosition(lat, lng, distance);
+            .getByPosition(query.lat, query.lng, query.distance,query.categoryId);
     }
 
 }

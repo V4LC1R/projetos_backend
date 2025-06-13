@@ -1,16 +1,18 @@
 import { AddressCreateInput } from "./AddressCreateInput";
+import { ScheduleCreateInput } from "./ScheduleCreateInput";
 
 export class AreaCreateInput {
     name: string;
     rent: number;
     address:AddressCreateInput
-    schedule:any[]
+    schedule:ScheduleCreateInput[]
+    categories:number[]
 
     constructor(
         name: string,
         rent: number,
         address:AddressCreateInput,
-        schedule:any
+        schedule:ScheduleCreateInput[]
     ) {
         this.name = name;
         this.rent = rent;

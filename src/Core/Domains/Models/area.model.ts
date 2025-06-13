@@ -1,5 +1,5 @@
 import { AddressModel } from "./address.model";
-import { OwnerModel } from "./owner.model";
+import { CategoryModel } from "./category.model";
 import { ScheduleModel } from "./schedule.model";
 
 export class AreaModel {
@@ -11,6 +11,7 @@ export class AreaModel {
     ownerId:number
     address:AddressModel
     schedule:ScheduleModel[]
+    categories:CategoryModel[]
 
     constructor(name: string, rent: number, createdAt: Date, updatedAt: Date) {
         this.name = name;
@@ -21,6 +22,11 @@ export class AreaModel {
 
     setId(id:number){
         this.id = id
+        return this
+    }
+
+    setCategories(categories:CategoryModel[]){
+        this.categories = categories
         return this
     }
 

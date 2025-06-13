@@ -6,12 +6,15 @@ import {
     OneToOne,
     JoinColumn,
     OneToMany,
-    ManyToOne
+    ManyToOne,
+    ManyToMany,
+    JoinTable
 } from 'typeorm';
 import { User } from './user.schema';
 import { Event } from './event.schema';
 import { Address } from './address.schema';
 import { ActiveStatusEnum } from '@shared/Visibility';
+import { Category } from './category.schema';
 
 @Entity()
 export class Area {
@@ -45,4 +48,12 @@ export class Area {
 
     @OneToMany(() => Schedule, event => event.area,{ eager: true })
     public schedule: Schedule[];
+
+    @ManyToMany(() => Category, (category) => category.areas, { eager: true })
+    @JoinTable({
+      name: "area_category",
+      joinColumn: { name: "area_id", referencedColumnName: "id" },
+      inverseJoinColumn: { name: "category_id", referencedColumnName: "id" },
+    })
+    public categories: Category[];
 }

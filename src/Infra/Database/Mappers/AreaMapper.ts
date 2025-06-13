@@ -3,6 +3,7 @@ import { AddressMapper } from "./AddressMapper";
 import { Area } from "../Schemas/area.schema";
 import { ScheduleMapper } from "./ScheduleMapper";
 import { User } from "../Schemas/user.schema";
+import { CategoryMapper } from "./CategoryMapper";
 
 export class AreaMapper {
 
@@ -19,6 +20,9 @@ export class AreaMapper {
     if (area.owner) {
       domain.setOwner(area.owner.id);
     }
+
+    if(area.categories && area.categories.length > 0)
+      domain.setCategories(area.categories.map(c=>CategoryMapper.toDomain(c)))
 
     if (area.address) {
       domain.setAddress(AddressMapper.toDomain(area.address));
@@ -40,6 +44,9 @@ export class AreaMapper {
     orm.rent = domain.rent;
     orm.createdAt = domain.createdAt;
     orm.updatedAt = domain.updatedAt;
+
+    if(domain.categories && domain.categories.length > 0)
+      orm.categories = domain.categories.map(c=>CategoryMapper.toORM(c))
 
     if (domain.ownerId) {
       orm.owner = {id:domain.ownerId} as User;

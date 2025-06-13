@@ -5,7 +5,6 @@ export class ScheduleCreateInput {
     end_time: Date;
     date:Date
    
-
     constructor(
         start_time: Date,
         end_time: Date,

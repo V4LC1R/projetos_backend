@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Post, Put, Req } from '@nestjs/common';
 
 import { AuthUserInputDTO } from '@api/DTO/auth-user.input.dto';
 import { CreateUserInputDTO } from '@api/DTO/create-user.input.dto';
@@ -33,5 +33,12 @@ export class AuthController {
         return await this
             .userService
             .changePassword(req.user.id, data.password);
+    }
+
+    @Delete('/')
+    async selfDelete(@Req() req, @Body() data:UpdatePasswordInputDTO){
+        return await this
+            .userService
+            .selfDelete(req.user.id);
     }
 }

@@ -18,7 +18,8 @@ export class AreaService {
     async create(owner_id:number,areaData:AreaCreateInput) {
         const createAreaPayload = new  AreaBuilder()
             .setName(areaData.name)
-            .setOwner({id:owner_id});
+            .setOwner({id:owner_id})
+            .setCategories(areaData.categories);
         
         const area = await this.areaRepo.create(createAreaPayload.build());
         if(!area.id)
@@ -76,8 +77,8 @@ export class AreaService {
         return areas;
     }
 
-    async getByPosition(lat:number, lng:number, distance:number) {
-        const areas = await this.areaRepo.findByCoordinates(lat,lng,distance);
+    async getByPosition(lat:number, lng:number, distance:number,categoryId?:number[]) {
+        const areas = await this.areaRepo.findByCoordinates(lat,lng,distance,categoryId);
         return areas
     }
 
