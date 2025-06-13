@@ -1,7 +1,6 @@
 import { CreateEventInputDTO } from '@api/DTO/create-event.input.dto';
 import { EventAreaService } from '@app/Services/event.service';
-import { HTTPErrorFactory } from '@infra/Helper/HTTPErrorFactory';
-import { Body, Controller, Delete, Get, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
 
 
 @Controller('event')
@@ -10,52 +9,44 @@ export class EventController {
             private readonly eventService : EventAreaService
         ){}
 
-    @Get('/')
-    async getEvents() {
-      
-    }
-
-    @Get('/:id')
-    async getEventById() {
-        // Logic to get an event by ID
-        return { message: 'Event details' };
-    }
-
-    @Get('/my-events/')
-    async getMyEvents() {
-        // Logic to get an event by ID
-        return { message: 'Event details' };
+    @Get('/my-events')
+    async getEvents(@Req() req) {
+         return await this
+            .eventService.myEvents(req.user.id)
     }
 
     @Get('/area-events/:id')
-    async getEventsByArea() {
-        // Logic to get an event by ID
-        return { message: 'Event details' };
+    async getEventsByArea(@Param('id') id,@Req() req) {
+        return await this
+            .eventService
+            .eventsByArea(id,req.user.id);
     }
 
     @Post('/')
     async createEvent(@Req() req, @Body() body:CreateEventInputDTO) {
-        try {
-            return await this
-                .eventService
-                .create({...body,ownerId:req.user.id});
-        } catch (error) {
-            console.log(error)
-            throw HTTPErrorFactory
-                 .INTERNAL_SERVER_ERROR('Error to create event', error)
-        }
+        return await this
+            .eventService
+            .create({...body,ownerId:req.user.id});
     }
 
-    @Put('/')
-    async updateEvent() {
-        // Logic to update an event
-        return { message: 'Event updated successfully' };
+    @Put('/:id')
+    async update(@Param('id') id:number, @Req() req, @Body() body:CreateEventInputDTO) {
+        return await this
+            .eventService
+            .update(id,req.user.id,{...body});
     }
 
-    @Delete('/')
-    async deleteEvent() {
-        // Logic to delete an event
-        return { message: 'Event deleted successfully' };
+    @Delete('/guest/:id')
+    async deleteGuest(@Param('id') id,@Req() req){
+        return await this
+            .eventService
+            .deleteForGuest(id,req.user.id);
     }
 
+    @Delete('/owner-area/:id')
+    async deleteOwnerArea(@Param('id') id,@Req() req){
+        return await this
+            .eventService
+            .deleteForOwnerArea(id,req.user.id);
+    }
 }

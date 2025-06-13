@@ -11,6 +11,7 @@ import { User } from './user.schema';
 import { Area } from './area.schema';
 import { EventTypeEnum } from 'src/Core/Domains/Models/event.model';
 import { Schedule } from './schedule.schema';
+import { ActiveStatusEnum } from '@shared/Visibility';
 
 @Entity()
 export class Event {
@@ -23,6 +24,9 @@ export class Event {
 
     @Column({ type: 'int' })
     type: EventTypeEnum
+
+    @Column({ type: 'int' ,default:ActiveStatusEnum.ACTIVE})
+    active:ActiveStatusEnum
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

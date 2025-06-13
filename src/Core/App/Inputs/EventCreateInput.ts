@@ -5,14 +5,17 @@ export class EventCreateInput {
     areaId: number;
     ownerId: number;
     type:EventTypeEnum
+    schedules: number[]; 
 
     constructor(
         name: string,
         areaId: number,
-        ownerId: number
+        ownerId: number,
+        schedules:number[]
     ) {
         this.name = name;
         this.areaId = areaId;
         this.ownerId = ownerId
+        this.schedules = schedules
     }
 }

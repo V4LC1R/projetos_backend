@@ -1,12 +1,14 @@
-import { AreaModel } from "./area.model";
-import { GuestModel } from "./guest.model";
 import { ScheduleModel } from "./schedule.model";
-import { UserModel } from "./user.model";
 
 export enum EventTypeEnum{
     SIMPLE = 1,
     TOURNAMENT = 2,
     PARTY = 3
+}
+
+export enum EventStatusEnum{
+    ACTIVE = 1,
+    INACTIVE = 2
 }
 
 export class EventModel {

@@ -3,6 +3,7 @@
 import { ScheduleModel } from "@domain/Models/schedule.model";
 import { Schedule } from "../Schemas/schedule.schema";
 import { Area } from "../Schemas/area.schema";
+import { Event } from "../Schemas/event.schema";
 
 export class ScheduleMapper {
 
@@ -17,6 +18,9 @@ export class ScheduleMapper {
 
     if(schedule.area)
       model.setAreaId(schedule.area.id)
+
+    if(schedule.event)
+      model.setEventId(schedule.event.id)
   
     return model
   }
@@ -32,6 +36,9 @@ static toORM(domain: ScheduleModel): Schedule {
 
   orm.status = orm.status ?? 'unavailable';
   orm.area = { id: domain.areaId } as Area;
+
+  if(domain.eventId)
+    orm.event = {id:domain.eventId} as Event
 
   return orm;
 }

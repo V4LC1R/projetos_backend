@@ -5,6 +5,7 @@ import { Area } from '../Schemas/area.schema';
 import { IUserRepository } from '@domain/Repositories/user.repository';
 import { AreaModel } from '@domain/Models/area.model';
 import { AreaMapper } from '../Mappers/AreaMapper';
+import { ActiveStatusEnum } from '@shared/Visibility';
 
 export class AreaRepositoryTypeORM implements IAreaRepository {
     constructor(
@@ -21,7 +22,7 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
     
     async update(id:number,data:AreaModel){
 
-         const {schedule,address,...areaData} = data
+        const {schedule,address,...areaData} = data
 
         await this.ormRepo.update({id},{...areaData});
 
@@ -34,13 +35,14 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
     }
 
     async delete(id: number): Promise<boolean> {
-        return false
+        return !await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
     }
 
     async findById(id: number): Promise<AreaModel | null> {
         const area = await this.ormRepo.findOne({
             relations: { address: true,owner: true },
-            where:{id}
+            where:{id,active:ActiveStatusEnum.ACTIVE},
+            order:{id:'desc'}
         });
         
         if(!area)
@@ -50,7 +52,7 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
     }
 
     async findAll(): Promise<AreaModel[]> {
-        const areas = await this.ormRepo.find();
+        const areas = await this.ormRepo.find({order:{id:'desc'}});
         return areas.map(area => AreaMapper.toDomain(area));
     }
 
@@ -58,7 +60,8 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
 
         const areas = await this.ormRepo.find({
             relations: { address: true,owner:true},
-            where: { owner:{id:ownerId} }
+            where: { owner:{id:ownerId} ,active:ActiveStatusEnum.ACTIVE},
+            order:{id:'desc'}
         });
 
         return areas.map(area =>AreaMapper.toDomain(area))
@@ -83,6 +86,7 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
                 ) AS distance
             FROM address
             RIGHT JOIN areas ON areas.address_id = address.id
+            WHERE area.active = 1
             HAVING distance < :distance
             ORDER BY distance
         `;
@@ -96,6 +100,13 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
     async isOwner(ownerId: number, areaId: number): Promise<boolean> {
         return await this
             .ormRepo
-            .exists({where:{id:areaId,owner:{id:ownerId}}})
+            .exists(
+                {   where:
+                    {
+                        id:areaId,
+                        owner:{id:ownerId},
+                        active:ActiveStatusEnum.ACTIVE
+                    }
+                })
     }
 }

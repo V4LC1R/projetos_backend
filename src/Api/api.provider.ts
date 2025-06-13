@@ -60,10 +60,10 @@ const coreServices = [
         }
     },
     {
-        inject:[EventRepositoryTypeORM,AreaRepositoryTypeORM,UserRepositoryTypeORM],
+        inject:[EventRepositoryTypeORM,AreaRepositoryTypeORM,UserRepositoryTypeORM,ScheduleRepositoryTypeORM],
         provide:EventAreaService,
-        useFactory:(eventRepo:EventRepositoryTypeORM,areaRepo:AreaRepositoryTypeORM,userRepo:UserRepositoryTypeORM)=>{
-            return new EventAreaService(eventRepo,areaRepo,userRepo)
+        useFactory:(eventRepo:EventRepositoryTypeORM,areaRepo:AreaRepositoryTypeORM,userRepo:UserRepositoryTypeORM,schedule:ScheduleRepositoryTypeORM)=>{
+            return new EventAreaService(eventRepo,areaRepo,userRepo,schedule)
         }
     },
     {

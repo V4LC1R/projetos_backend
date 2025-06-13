@@ -25,11 +25,6 @@ export class AddressRepositoryTypeORM implements IAddressRepository {
         return AddressMapper.toDomain(entity);
     }
 
-    async delete(id: number): Promise<boolean> {
-        const result = await this.ormRepo.delete(id);
-        return result.affected !== 0;
-    }
-
     async findById(id: number): Promise<AddressModel | null> {
         const address = await this.ormRepo.findOne({ where: { id } });
         return address ? AddressMapper.toDomain(address) : null;
@@ -38,5 +33,9 @@ export class AddressRepositoryTypeORM implements IAddressRepository {
     async findAll(): Promise<AddressModel[]> {
         const addresses = await this.ormRepo.find();
         return addresses.map(AddressMapper.toDomain);
+    }
+
+    async delete(id: number): Promise<boolean> {
+       return false
     }
 }

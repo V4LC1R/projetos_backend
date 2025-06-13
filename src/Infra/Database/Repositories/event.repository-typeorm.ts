@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { Event } from '../Schemas/event.schema';
 import { IEventRepository } from 'src/Core/Domains/Repositories/event.repository';
 import { EventMapper } from '../Mappers/EventMapper';
+import { ActiveStatusEnum } from '@shared/Visibility';
 
 export class EventRepositoryTypeORM implements IEventRepository {
     constructor(
@@ -27,11 +28,11 @@ export class EventRepositoryTypeORM implements IEventRepository {
     }
 
     async delete(id: number): Promise<boolean> {
-        return false
+        return !await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
     }
 
     async findById(id: number): Promise<EventModel | null> {
-        const event = await this.ormRepo.findOne({where:{id}});
+        const event = await this.ormRepo.findOne({where:{id,active:ActiveStatusEnum.ACTIVE}});
         if(!event)
             return null;
 
@@ -43,20 +44,46 @@ export class EventRepositoryTypeORM implements IEventRepository {
         return events.map(event => EventMapper.toDomain(event));
     }
 
+    
+
+    async isGuestofEvent(guestId:number):Promise<boolean>{
+        return await this.ormRepo.exists({where:{owner:{id:guestId}}})
+    }
+
+    async isOwnerOfAreaEvent(ownerId:number):Promise<boolean>{
+        return await this.ormRepo.exists(
+            {
+                where:{
+                    area:{
+                        owner:{id:ownerId}
+                    }
+                }
+            }
+        )
+    }
+
     async eventsByAreaId(areaId: any, ownerId: any): Promise<EventModel[]> {
+        console.log(areaId,ownerId)
         const events = await this
             .ormRepo
             .find({
+                relations:{schedules:true},
                 where:{
+                    
                     area:{
                         id:areaId,
+                        active:ActiveStatusEnum.ACTIVE,
                         owner:{
-                            id:ownerId
+                            id:ownerId,
+                            active:ActiveStatusEnum.ACTIVE
                         }
-                    }
+                    },
+                    active:ActiveStatusEnum.ACTIVE
                 }
             })
 
+        console.log(events)
+            
         return events
             .map((event)=>EventMapper.toDomain(event)
         )
@@ -66,10 +93,10 @@ export class EventRepositoryTypeORM implements IEventRepository {
         const events = await this
             .ormRepo
             .find({
+                relations:{schedules:true},
                 where:{
-                    area:{
-                        owner:{id:organizerId}
-                    }
+                    owner:{id:organizerId,active:ActiveStatusEnum.ACTIVE},
+                    active:ActiveStatusEnum.ACTIVE
                 }
             })
 

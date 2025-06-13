@@ -1,4 +1,5 @@
 import { AddressCreateInput } from "@app/Inputs/AddressCreateInput";
+import { AddressUpdateInput } from "@app/Inputs/AddressUpdateInput";
 import { AddressModel } from "@domain/Models/address.model";
 import { AreaModel } from "@domain/Models/area.model";
 
@@ -111,7 +112,7 @@ export class AddressBuilder {
     return address;
   }
 
-  static fill(input: AddressCreateInput): AddressBuilder {
+  static fill(input: AddressCreateInput | AddressUpdateInput): AddressBuilder {
     return new AddressBuilder()
       .setNumberPlace(input.number_place)
       .setDistrict(input.district)

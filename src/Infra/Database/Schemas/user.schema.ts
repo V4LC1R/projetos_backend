@@ -6,6 +6,7 @@ import {
 } from 'typeorm';
 import { Event } from './event.schema';
 import { Area } from './area.schema';
+import { ActiveStatusEnum } from '@shared/Visibility';
 
 @Entity()
 export class User {
@@ -24,6 +25,9 @@ export class User {
 
     @Column({ type: 'varchar', length: 255, nullable: true })
     cellphone?: string;
+
+    @Column({ type: 'int' ,default:ActiveStatusEnum.ACTIVE})
+    active:ActiveStatusEnum
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

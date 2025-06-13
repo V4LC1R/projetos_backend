@@ -1,8 +1,9 @@
-import { In, Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 import { IScheduleRepository } from '@domain/Repositories/schedule.repository';
 import { Schedule } from '../Schemas/schedule.schema';
-import { ScheduleModel } from '@domain/Models/schedule.model';
+import { AvailabilityStatus, ScheduleModel } from '@domain/Models/schedule.model';
 import { ScheduleMapper } from '../Mappers/ScheduleMapper';
+import { ActiveStatusEnum } from '@shared/Visibility';
 
 export class ScheduleRepositoryTypeORM implements IScheduleRepository {
     constructor(
@@ -13,15 +14,7 @@ export class ScheduleRepositoryTypeORM implements IScheduleRepository {
         const model = ScheduleMapper.toORM(data); 
         const schedule =  await this.ormRepo.save(model);
         return ScheduleMapper.toDomain(schedule);
-    }  
-
-    async bulkInsert(schedulesData: ScheduleModel[]): Promise<ScheduleModel[]> {
-        const models = schedulesData.map((data,i)=>{return ScheduleMapper.toORM(data)})
-        const {generatedMaps} =  await this.ormRepo.insert(models);
-        const ids = (generatedMaps as Schedule[]).map(v => v.id);
-        const schedules = await this.ormRepo.findBy({id:In(ids)})
-        return schedules.map((s:Schedule)=>ScheduleMapper.toDomain(s))
-    }
+    } 
     
     async update(id:number,data:ScheduleModel):Promise<ScheduleModel>{
         await this.ormRepo.update({id},ScheduleMapper.toORM(data));
@@ -36,11 +29,11 @@ export class ScheduleRepositoryTypeORM implements IScheduleRepository {
     }
 
     async delete(id: number): Promise<boolean> {
-        return false
+        return !await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
     }
 
     async findById(id: number): Promise<ScheduleModel | null> {
-        const schedule = await this.ormRepo.findOne({where:{id}});
+        const schedule = await this.ormRepo.findOne({where:{id,active:ActiveStatusEnum.ACTIVE}});
         if(!schedule)
             return null;
 
@@ -52,4 +45,40 @@ export class ScheduleRepositoryTypeORM implements IScheduleRepository {
         return schedules.map(s => ScheduleMapper.toDomain(s));
     }
 
+    async bulkInsert(schedulesData: ScheduleModel[]): Promise<ScheduleModel[]> {
+        const models = schedulesData.map((data,i)=>{return ScheduleMapper.toORM(data)})
+        const {generatedMaps} =  await this.ormRepo.insert(models);
+        const ids = (generatedMaps as Schedule[]).map(v => v.id);
+        const schedules = await this.ormRepo.findBy({id:In(ids)})
+        return schedules.map((s:Schedule)=>ScheduleMapper.toDomain(s))
+    }
+
+    async addSchedulesInEvent(eventId:number,schedules: number[]): Promise<ScheduleModel[]> {
+        await this.ormRepo.update(
+            {id:In(schedules)},
+            {
+                event:{id:eventId},
+                status:AvailabilityStatus.RESERVED,
+                active:ActiveStatusEnum.ACTIVE
+            }
+        );
+        const schedulesUpdated = await this.ormRepo.findBy({id:In(schedules),active:ActiveStatusEnum.ACTIVE})
+        return schedulesUpdated.map((s:Schedule)=>ScheduleMapper.toDomain(s))
+    }
+
+    async isValidSchedule( schedules: number[]): Promise<boolean> {
+        const validate = await this.ormRepo.count(
+            {
+                where:{
+                    id:In(schedules),
+                    active:ActiveStatusEnum.ACTIVE,
+                    event:{id:IsNull()}
+                }
+            }
+        )
+            
+
+        return validate <= 0
+    }
+        
 }

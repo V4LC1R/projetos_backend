@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 
 import { APIProvider } from './api.provider';
-import { JWTMiddleware } from './Middlewares/JWTMiddleware';
+import { JWTMiddleware } from '../Infra/Http/Middlewares/JWTMiddleware';
 import { AreaController } from './Controllers/area.controller';
 import { EventController } from './Controllers/event.controller';
 import { AuthController } from './Controllers/auth.controller';

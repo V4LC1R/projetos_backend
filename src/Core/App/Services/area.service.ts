@@ -5,6 +5,8 @@ import { AreaBuilder } from "@domain/Builders/AreaBuildert";
 import { IScheduleRepository } from "@domain/Repositories/schedule.repository";
 import { AddressBuilder } from "@domain/Builders/AddressBuilder";
 import { ScheduleModel } from "@domain/Models/schedule.model";
+import { WrongOwnerActionExeception } from "@app/Errors/WrongOwnerActionExeception";
+import { AreaUpdateInput } from "@app/Inputs/AreaUpdateInput";
 
 export class AreaService {
     constructor(
@@ -33,22 +35,40 @@ export class AreaService {
         ).setAreaId(area.id))
 
         const schedules = await this.scheduleRepo.bulkInsert(scheduleModel)
-        console.log('sv',schedules)
+
         area
             .setAddress(address)
             .setSchedule(schedules)
         return area;
     }
 
-    async edit(areaId:number,ownerId:number,areaData:AreaCreateInput){
+    async delete(areaId:number,ownerId:number){
+        const isCorrectOwner = await this.areaRepo.isOwner(ownerId,areaId)
+
+        if(!isCorrectOwner)
+            throw new WrongOwnerActionExeception("This user is not owner from this area!");
+
+        if(!await this.areaRepo.delete(areaId))
+            throw new Error("Error in delete area!")
+
+        return {
+            "message":"Area was deleted",
+            "status":"sucess"
+        }
+    }
+
+    async edit(areaId:number,ownerId:number,areaData:AreaUpdateInput){
 
         const isCorrectOwner = await this.areaRepo.isOwner(ownerId,areaId)
 
         if(!isCorrectOwner)
-            throw new Error("This user is not owner from this area!");
+            throw new WrongOwnerActionExeception("This user is not owner from this area!");
 
         const area = await this.areaRepo.update(areaId,areaData)
-        return area
+        const addressPayload =  AddressBuilder.fill(areaData.address)
+
+        const address = await this.addressRepo.update(areaData.address.id,addressPayload.build())
+        return area.setAddress(address)
     }
 
     async getAllByOwner(ownerId: number) {

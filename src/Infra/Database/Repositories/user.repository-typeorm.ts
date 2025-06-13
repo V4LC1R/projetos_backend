@@ -3,6 +3,7 @@ import { IUserRepository } from '../../../Core/Domains/Repositories/user.reposit
 import { Repository } from 'typeorm';
 import { User } from '../Schemas/user.schema';
 import { GuestModel } from '@domain/Models/guest.model';
+import { ActiveStatusEnum } from '@shared/Visibility';
 
 export class UserRepositoryTypeORM implements IUserRepository {
     constructor(
@@ -11,7 +12,7 @@ export class UserRepositoryTypeORM implements IUserRepository {
 
     async findByEmail(userEmail: string): Promise<UserModel|null> {
 
-        const user = await this.ormRepo.findOne({where:{email:userEmail}})
+        const user = await this.ormRepo.findOne({where:{email:userEmail,active:ActiveStatusEnum.ACTIVE}})
 
         if(!user)
             return null;
@@ -39,11 +40,12 @@ export class UserRepositoryTypeORM implements IUserRepository {
     }
 
     async delete(id: number): Promise<boolean> {
-        return false
+        const { generatedMaps } =await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
+        return generatedMaps.length > 0
     }
 
     async findById(id: number): Promise<UserModel | null> {
-        const user = await this.ormRepo.findOne({where:{id}});
+        const user = await this.ormRepo.findOne({where:{id,active:ActiveStatusEnum.ACTIVE}});
         if(!user)
             return null;
 
@@ -65,7 +67,7 @@ export class UserRepositoryTypeORM implements IUserRepository {
     }
 
     async updatePassword(userId: number, newPassword: string) {
-        await this.ormRepo.update({id:userId},{password:newPassword});
+        await this.ormRepo.update({id:userId,active:ActiveStatusEnum.ACTIVE},{password:newPassword});
 
         const user = await this.findById(userId);
         if(!user) 

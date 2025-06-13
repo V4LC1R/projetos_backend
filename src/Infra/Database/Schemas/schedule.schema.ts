@@ -11,12 +11,8 @@ import {
 import { Area } from './area.schema';
 import { Event } from './event.schema';
 import { User } from './user.schema';
-
-export enum AvailabilityStatus {
-  AVAILABLE = 'available',
-  UNAVAILABLE = 'unavailable',
-  RESERVED = 'reserved',
-}
+import { AvailabilityStatus } from '@domain/Models/schedule.model';
+import { ActiveStatusEnum } from '@shared/Visibility';
 
 @Entity()
 export class Schedule {
@@ -41,6 +37,9 @@ export class Schedule {
 
     @Column({type:'varchar',default:AvailabilityStatus.UNAVAILABLE})
     status: AvailabilityStatus;
+
+    @Column({ type: 'int' ,default:ActiveStatusEnum.ACTIVE})
+    active:ActiveStatusEnum
 
     @ManyToOne(() => Event, event => event.schedules, { nullable: true })
     @JoinColumn({ name: 'eventId' })

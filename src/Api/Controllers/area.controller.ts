@@ -1,9 +1,7 @@
 import { CreateAreaInputDto } from '@api/DTO/create-area.input.dto';
+import { UpdateAreaInputDto } from '@api/DTO/update-area.input.dto';
 import { AreaService } from '@app/Services/area.service';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request } from '@nestjs/common';
-
-
-import { HTTPErrorFactory } from 'src/Infra/Helper/HTTPErrorFactory';
 
 @Controller('area')
 export class AreaController {
@@ -14,66 +12,44 @@ export class AreaController {
 
     @Post('/')
     async store(@Request() req, @Body() areaDto:CreateAreaInputDto){
-        try {
-            return await this
-                .areaService
-                .create(req.user.id,areaDto);
-        } catch (error) {
-            console.log(error)
-            throw HTTPErrorFactory
-                .INTERNAL_SERVER_ERROR('Error to create area', error)
-        }
+        return await this
+            .areaService
+            .create(req.user.id,areaDto);
     }
 
-    @Put('/')
-    async update(@Param('id') id, @Request() req, @Body() areaDto:CreateAreaInputDto){
-        try {
-            return await this
-                .areaService
-                .edit(id,req.user.id,areaDto);
-        } catch (error) {
-            console.log(error)
-            throw HTTPErrorFactory
-                .INTERNAL_SERVER_ERROR('Error to create area', error)
-        }
+    @Put('/:id')
+    async update(@Param('id') id, @Request() req, @Body() areaDto:UpdateAreaInputDto){
+        return await this
+            .areaService
+            .edit(id,req.user.id,areaDto)
     }
 
-    @Get('/')
+    @Get('/:id')
     async show(@Param('id') id){
-        try{
-            return await this
-                .areaService
-                .getById(id);
-        }catch(error){
-            console.log(error)
-            throw HTTPErrorFactory
-                .INTERNAL_SERVER_ERROR('Error to get areas', error)
-        }
+        return await this
+            .areaService
+            .getById(id);
+    }
+
+    @Delete('/:id')
+    async delete(@Param('id') id,@Request() req){
+        return await this
+            .areaService
+            .delete(id,req.user.id);
     }
 
     @Get('/my-areas')
     async getByOwner(@Request() req){
-        try{
-            return await this
-                .areaService
-                .getAllByOwner(req.user.id);
-        }catch(error){
-            console.log(error)
-            throw HTTPErrorFactory
-                .INTERNAL_SERVER_ERROR('Error to get areas', error)
-        }
+        return await this
+            .areaService
+            .getAllByOwner(req.user.id);
     }
 
     @Get('/by-position')
-    async getByPosition(@Query("lat") lat,@Query("lng") lng, @Query("distance") distance){
-        try{
-            return await this
-                .areaService
-                .getByPosition(lat, lng, distance);
-        }catch(error){
-            throw HTTPErrorFactory
-                .INTERNAL_SERVER_ERROR('Error to get areas', error)
-        }
+    async getByPosition(@Query("lat") lat,@Query("lng") lng, @Query("distance") distance, @Query("search") textSearch:string){
+        return await this
+            .areaService
+            .getByPosition(lat, lng, distance);
     }
 
 }

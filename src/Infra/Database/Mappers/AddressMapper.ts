@@ -1,6 +1,5 @@
 import { AddressModel } from "@domain/Models/address.model";
 import { Address } from "../Schemas/address.schema";
-import { AreaMapper } from "./AreaMapper";
 import { Area } from "../Schemas/area.schema";
 
 export class AddressMapper {

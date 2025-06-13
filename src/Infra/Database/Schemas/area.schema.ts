@@ -11,6 +11,7 @@ import {
 import { User } from './user.schema';
 import { Event } from './event.schema';
 import { Address } from './address.schema';
+import { ActiveStatusEnum } from '@shared/Visibility';
 
 @Entity()
 export class Area {
@@ -23,6 +24,9 @@ export class Area {
 
     @Column({ type: 'decimal', precision: 10, scale: 3 })
     rent: number;
+
+    @Column({ type: 'int' ,default:ActiveStatusEnum.ACTIVE})
+    active:ActiveStatusEnum
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

@@ -3,12 +3,16 @@ import { EventCreateInput } from "../Inputs/EventCreateInput";
 import { IAreaRepository } from "src/Core/Domains/Repositories/area.repository";
 import { IUserRepository } from "src/Core/Domains/Repositories/user.repository";
 import { EventModel } from "@domain/Models/event.model";
+import { IScheduleRepository } from "@domain/Repositories/schedule.repository";
+import { ScheduleWasAlocatedException } from "@app/Errors/ScheduleWasAlocatedExeceptions";
+import { WrongOwnerActionExeception } from "@app/Errors/WrongOwnerActionExeception";
 
 export class EventAreaService {
     constructor(
         private readonly eventRepo:IEventRepository,
         private readonly areaRepo:IAreaRepository,
-        private readonly userRepo:IUserRepository
+        private readonly userRepo:IUserRepository,
+        private readonly scheduleRepo:IScheduleRepository
     ){}
 
     async create(data:EventCreateInput){
@@ -22,7 +26,12 @@ export class EventAreaService {
             .setArea(area.id)
             .setGuest(guest.guestId)
         const event = await this.eventRepo.create(eventModel)
-        return event;
+
+        if(await this.scheduleRepo.isValidSchedule(data.schedules))
+            throw new ScheduleWasAlocatedException();
+
+        const schedule = await this.scheduleRepo.addSchedulesInEvent(event.id,data.schedules)
+        return event.setSchedule(schedule);
     }
 
     async eventsByArea(areaId:number,ownerId:number){
@@ -33,11 +42,45 @@ export class EventAreaService {
         return events
     }
 
-    async myEvents(areaId:number,ownerId:number){
+    async myEvents(guest:number){
         const events = await this
             .eventRepo
-            .eventsByOrganizerId(ownerId);
+            .eventsByOrganizerId(guest);
 
         return events
     }
+
+    async update(eventId:number,guest:number,data:any){
+        //informacoes base do evento
+    }
+
+    async deleteForGuest(eventId:number,userId:number){
+        
+        if(!await this.eventRepo.isGuestofEvent(userId))
+            throw new WrongOwnerActionExeception("This user is not main Guest!")
+
+        if(!await this.eventRepo.delete(eventId))
+            throw new Error("Error in delete event")
+
+        return {
+            "message":"Event was deleted",
+            "status":"sucess"
+        }
+
+    }
+
+    async deleteForOwnerArea(eventId:number,userId:number){
+
+        if(!await this.eventRepo.isOwnerOfAreaEvent(userId))
+            throw new WrongOwnerActionExeception("This user is not owner for this area!")
+
+        if(!await this.eventRepo.delete(eventId))
+            throw new Error("Error in delete event")
+
+        return {
+            "message":"Event was deleted",
+            "status":"sucess"
+        }
+    }
+
 }
