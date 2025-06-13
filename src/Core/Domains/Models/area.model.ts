@@ -1,48 +1,41 @@
 import { AddressModel } from "./address.model";
 import { OwnerModel } from "./owner.model";
+import { ScheduleModel } from "./schedule.model";
 
 export class AreaModel {
-    id?: number;
+    id:number
     name: string;
     rent: number;
     createdAt: Date;
     updatedAt: Date;
-    owner: OwnerModel;
+    ownerId:number
     address:AddressModel
+    schedule:ScheduleModel[]
 
-    constructor(name: string, rent: number, createdAt: Date, updatedAt: Date, id?: number) {
+    constructor(name: string, rent: number, createdAt: Date, updatedAt: Date) {
         this.name = name;
         this.rent = rent;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.id = id;
     }
 
-    setOwner(owner: Partial<OwnerModel>) {
-        this.owner = new OwnerModel(
-            owner.name ?? '',
-            owner.email ?? '',
-            '',
-            owner.id ?? 0
-        );
-
+    setId(id:number){
+        this.id = id
         return this
     }
 
-    setAddress(address: Partial<AddressModel>){
-        this.address = new AddressModel(
-            address.number_place ?? "",
-            address.district ?? "",
-            address.country ?? "",
-            address.street ?? "",
-            address.city ?? "",
-            address.state ?? "",
-            address.complement ?? "",
-            address.latitude ?? "",
-            address.longitude ?? "",
-            address.areaId ?? 0,
-            address.id ?? 0
-        )
+    setOwner(ownerId: number) {
+        this.ownerId = ownerId
+        return this
+    }
+
+    setSchedule(schedule: ScheduleModel[]) {
+        this.schedule = schedule
+        return this
+    }
+
+    setAddress(address: AddressModel){
+        this.address = address
 
         return this
     }

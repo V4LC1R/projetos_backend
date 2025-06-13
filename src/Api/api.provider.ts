@@ -24,6 +24,8 @@ import { Address } from "src/Infra/Database/Schemas/address.schema";
 import { EventRepositoryTypeORM } from "src/Infra/Database/Repositories/event.repository-typeorm";
 import { Event } from "src/Infra/Database/Schemas/event.schema";
 import { EventAreaService } from "src/Core/App/Services/event.service";
+import { ScheduleRepositoryTypeORM } from "@infra/Database/Repositories/schedule.repository-typeorm";
+import { Schedule } from "@infra/Database/Schemas/schedule.schema";
 
 const controllers = [
     AuthController,
@@ -65,10 +67,10 @@ const coreServices = [
         }
     },
     {
-        inject:[AreaRepositoryTypeORM,AddressService],
+        inject:[AreaRepositoryTypeORM,AddressRepositoryTypeORM,ScheduleRepositoryTypeORM],
         provide:AreaService,
-        useFactory:(areaRepo:AreaRepositoryTypeORM,addressService:AddressService)=>{
-            return new AreaService(areaRepo,addressService)
+        useFactory:(areaRepo:AreaRepositoryTypeORM,addressRepo:AddressRepositoryTypeORM,scheduleRepo:ScheduleRepositoryTypeORM)=>{
+            return new AreaService(areaRepo,addressRepo,scheduleRepo)
         }
     }
 ]
@@ -108,6 +110,15 @@ const repositories = [
         useFactory:(dataSource:DataSource)=>{
             return new UserRepositoryTypeORM(
                 dataSource.getRepository(User)
+            )
+        }
+    },
+    {
+        inject:[getDataSourceToken()],
+        provide:ScheduleRepositoryTypeORM,
+        useFactory:(dataSource:DataSource)=>{
+            return new ScheduleRepositoryTypeORM(
+                dataSource.getRepository(Schedule)
             )
         }
     }

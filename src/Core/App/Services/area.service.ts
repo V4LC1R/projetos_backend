@@ -1,21 +1,42 @@
 import { IAreaRepository } from "src/Core/Domains/Repositories/area.repository";
 import { AreaCreateInput } from "../Inputs/AreaCreateInput";
-import { AddressService } from "./address.service";
+import { IAddressRepository } from "@domain/Repositories/address.repository";
+import { AreaBuilder } from "@domain/Builders/AreaBuildert";
+import { IScheduleRepository } from "@domain/Repositories/schedule.repository";
+import { AddressBuilder } from "@domain/Builders/AddressBuilder";
+import { ScheduleModel } from "@domain/Models/schedule.model";
 
 export class AreaService {
     constructor(
         private readonly areaRepo:IAreaRepository,
-        private readonly addressService:AddressService
+        private readonly addressRepo:IAddressRepository,
+        private readonly scheduleRepo:IScheduleRepository
     ) {}
 
     async create(owner_id:number,areaData:AreaCreateInput) {
-      
-        const createAreaPayload = {...areaData,owner:{id:owner_id}}
-        const area = await this.areaRepo.create(createAreaPayload);
+        const createAreaPayload = new  AreaBuilder()
+            .setName(areaData.name)
+            .setOwner({id:owner_id});
+        
+        const area = await this.areaRepo.create(createAreaPayload.build());
         if(!area.id)
             throw new Error('Something went wrong on creating area');
 
-        await this.addressService.create(area.id,areaData.address)
+        const createAddressPayload = AddressBuilder.fill(areaData.address)
+        createAddressPayload.setAreaId(area.id)
+        const address = await this.addressRepo.create(createAddressPayload.build())
+
+        const scheduleModel = areaData.schedule.map(e=>new ScheduleModel(
+            e.start_time,
+            e.end_time,
+            e.date,
+        ).setAreaId(area.id))
+
+        const schedules = await this.scheduleRepo.bulkInsert(scheduleModel)
+        console.log('sv',schedules)
+        area
+            .setAddress(address)
+            .setSchedule(schedules)
         return area;
     }
 
@@ -32,17 +53,16 @@ export class AreaService {
 
     async getAllByOwner(ownerId: number) {
         const areas = await this.areaRepo.findByOwnerId(ownerId);
-        
         return areas;
     }
 
     async getByPosition(lat:number, lng:number, distance:number) {
-        const areas = await this.addressService.getByPosition(lat,lng,distance);
+        const areas = await this.areaRepo.findByCoordinates(lat,lng,distance);
         return areas
     }
 
     async getById(areaId:number){
-        const area = await this.getById(areaId);
+        const area = await this.areaRepo.findById(areaId);
         return area
     }
 }

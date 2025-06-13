@@ -2,6 +2,7 @@ import { IEventRepository } from "src/Core/Domains/Repositories/event.repository
 import { EventCreateInput } from "../Inputs/EventCreateInput";
 import { IAreaRepository } from "src/Core/Domains/Repositories/area.repository";
 import { IUserRepository } from "src/Core/Domains/Repositories/user.repository";
+import { EventModel } from "@domain/Models/event.model";
 
 export class EventAreaService {
     constructor(
@@ -12,9 +13,15 @@ export class EventAreaService {
 
     async create(data:EventCreateInput){
         const area = await this.areaRepo.findById(data.areaId);
-        const owner = await this.userRepo.findById(data.ownerId)
-        const { areaId,ownerId,...eventData} = data
-        const event = await this.eventRepo.create({area,owner,event:eventData})
+        const guest = await this.userRepo.findGuestById(data.ownerId)
+
+        if(!area || !guest)
+            throw new Error("Err to create event!")
+
+        const eventModel = new EventModel(data.name,data.type)
+            .setArea(area.id)
+            .setGuest(guest.guestId)
+        const event = await this.eventRepo.create(eventModel)
         return event;
     }
 

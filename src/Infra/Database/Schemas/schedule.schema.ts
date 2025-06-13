@@ -4,10 +4,13 @@ import {
     Column, 
     OneToMany,
     OneToOne,
-    ManyToOne
+    ManyToOne,
+    JoinColumn
 } from 'typeorm';
 
 import { Area } from './area.schema';
+import { Event } from './event.schema';
+import { User } from './user.schema';
 
 export enum AvailabilityStatus {
   AVAILABLE = 'available',
@@ -24,10 +27,10 @@ export class Schedule {
     @Column({ type: 'date' })
     date: string;
 
-    @Column({ type: 'time with time zone'})
+    @Column({ type: 'timestamp'})
     start_time: string;
 
-    @Column({ type: 'time with time zone' })
+    @Column({ type: 'timestamp'})
     end_time: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -36,13 +39,18 @@ export class Schedule {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
-    @Column({
-        type: 'enum',
-        enum: AvailabilityStatus,
-        default: AvailabilityStatus.AVAILABLE,
-    })
+    @Column({type:'varchar',default:AvailabilityStatus.UNAVAILABLE})
     status: AvailabilityStatus;
 
+    @ManyToOne(() => Event, event => event.schedules, { nullable: true })
+    @JoinColumn({ name: 'eventId' })
+    event?: Event;
+
     @ManyToOne(() => Area, (area) => area.events)
+    @JoinColumn()
     public area: Area
+
+    @ManyToOne(() => User, (user) => user.events)
+    @JoinColumn()
+    public guest: User
 }

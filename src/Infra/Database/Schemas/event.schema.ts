@@ -4,11 +4,13 @@ import {
     Column,
     ManyToOne,
     JoinColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
+    OneToMany
 } from 'typeorm';
 import { User } from './user.schema';
 import { Area } from './area.schema';
 import { EventTypeEnum } from 'src/Core/Domains/Models/event.model';
+import { Schedule } from './schedule.schema';
 
 @Entity()
 export class Event {
@@ -27,6 +29,12 @@ export class Event {
 
     @UpdateDateColumn({ type: 'timestamp' })
     updatedAt: Date;
+
+    @OneToMany(() => Schedule, schedule => schedule.event, {
+      cascade: true,
+      eager: false,
+    })
+    public schedules: Schedule[];
 
     @ManyToOne(() => Area, (area) => area.events)
     @JoinColumn()

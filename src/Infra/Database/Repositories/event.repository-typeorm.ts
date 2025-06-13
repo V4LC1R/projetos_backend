@@ -1,34 +1,29 @@
-import { EventModel, EventTypeEnum } from 'src/Core/Domains/Models/event.model';
-import { UserModel } from 'src/Core/Domains/Models/user.model';
+import { EventModel } from 'src/Core/Domains/Models/event.model';
 import { Repository } from 'typeorm';
 import { Event } from '../Schemas/event.schema';
 import { IEventRepository } from 'src/Core/Domains/Repositories/event.repository';
-import { AreaModel } from 'src/Core/Domains/Models/area.model';
+import { EventMapper } from '../Mappers/EventMapper';
 
 export class EventRepositoryTypeORM implements IEventRepository {
     constructor(
         private ormRepo:Repository<Event>
     ){}
 
-    async create(data:{event:EventModel,owner:UserModel,area:AreaModel}):Promise<any>{
-        const model = this.ormRepo.create({
-            ...data.event,
-            area:data.area,
-            owner:data.owner,
-        }); 
+    async create(data:EventModel):Promise<any>{
+        const model = EventMapper.toORM(data)
 
         const event =  await this.ormRepo.save(model);
-        return new EventModel(event.name, event.type, event.id);
+        return EventMapper.toDomain(event);
     }  
     
     async update(id:number,data:EventModel):Promise<EventModel>{
-        await this.ormRepo.update({id},data);
+        await this.ormRepo.update({id},EventMapper.toORM(data));
 
         const event = await this.findById(id);
         if(!event) 
             throw new Error("User not found");
 
-         return new EventModel(event.name, event.type, event.id);
+         return event
     }
 
     async delete(id: number): Promise<boolean> {
@@ -40,13 +35,12 @@ export class EventRepositoryTypeORM implements IEventRepository {
         if(!event)
             return null;
 
-        const {name,type,id : event_id} = event;
-        return new EventModel(name,type,event_id);
+        return EventMapper.toDomain(event);
     }
 
     async findAll(): Promise<EventModel[]> {
         const events = await this.ormRepo.find();
-        return events.map(event => new EventModel(event.name, event.type, event.id));
+        return events.map(event => EventMapper.toDomain(event));
     }
 
     async eventsByAreaId(areaId: any, ownerId: any): Promise<EventModel[]> {
@@ -64,11 +58,7 @@ export class EventRepositoryTypeORM implements IEventRepository {
             })
 
         return events
-            .map((val)=> new EventModel(
-                val.name,
-                val.type,
-                val.id
-           )
+            .map((event)=>EventMapper.toDomain(event)
         )
     }
 
@@ -84,11 +74,7 @@ export class EventRepositoryTypeORM implements IEventRepository {
             })
 
         return events
-            .map((val)=> new EventModel(
-                val.name,
-                val.type,
-                val.id
-           )
+            .map((event)=> EventMapper.toDomain(event)
         )
     }
 

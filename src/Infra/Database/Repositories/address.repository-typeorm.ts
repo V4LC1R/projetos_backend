@@ -1,93 +1,42 @@
 import { IAddressRepository } from 'src/Core/Domains/Repositories/address.repository';
 import { Repository } from 'typeorm';
 import { Address } from '../Schemas/address.schema';
-import { AreaModel } from '@domain/Models/area.model';
 import { AddressModel } from '@domain/Models/address.model';
+import { AddressMapper } from '../Mappers/AddressMapper';
 
 export class AddressRepositoryTypeORM implements IAddressRepository {
-    constructor(
-        private ormRepo:Repository<Address>
-    ){}
+    constructor(private ormRepo: Repository<Address>) {}
 
-    async create(data:{address:AddressModel,area:AreaModel}):Promise<AddressModel>{
-        const model = this.ormRepo.create({...data.address,area:data.area}); 
-        
-        const address =  await this.ormRepo.save(model);
+    async create(data: AddressModel): Promise<AddressModel> {
+        const model = AddressMapper.toORM(data); 
+        const address = await this.ormRepo.save(model);
+        return AddressMapper.toDomain(address);
+    }
 
-        return new AddressModel(
-            address.number_place,
-            address.district,
-            address.country,
-            address.street,
-            address.city,
-            address.state,
-            address.complement,
-            address.latitude,
-            address.longitude,
-            data.area.id ?? 0
-        )
-    }  
-    
-    async update(id:number,data:AddressModel):Promise<AddressModel>{
-        await this.ormRepo.update({id:id},data);
-        if(!data.id)
-            throw new Error("address not found");
+    async update(id: number, data: AddressModel): Promise<AddressModel> {
+        const exists = await this.ormRepo.findOne({ where: { id } });
+        if (!exists) throw new Error("address not found");
 
-        const address = await this.findById(id);
-        if(!address) 
-            throw new Error("address not found");
+        const entity = AddressMapper.toORM(data);
+        entity.id = id;
 
-        return new AddressModel(
-            address.number_place,
-            address.district,
-            address.country,
-            address.street,
-            address.city,
-            address.state,
-            address.complement,
-            address.latitude,
-            address.longitude,
-            address.areaId
-        )
+        await this.ormRepo.save(entity);
+
+        return AddressMapper.toDomain(entity);
     }
 
     async delete(id: number): Promise<boolean> {
-        return false
+        const result = await this.ormRepo.delete(id);
+        return result.affected !== 0;
     }
 
     async findById(id: number): Promise<AddressModel | null> {
-        const address = await this.ormRepo.findOne({where:{id}});
-        if(!address)
-            return null;
-
-        return new AddressModel(
-            address.number_place,
-            address.district,
-            address.country,
-            address.street,
-            address.city,
-            address.state,
-            address.complement,
-            address.latitude,
-            address.longitude,
-            address.area.id
-        )
+        const address = await this.ormRepo.findOne({ where: { id } });
+        return address ? AddressMapper.toDomain(address) : null;
     }
 
     async findAll(): Promise<AddressModel[]> {
-        const address = await this.ormRepo.find();
-        return address.map((address: Address) => new AddressModel(
-            address.number_place,
-            address.district,
-            address.country,
-            address.street,
-            address.city,
-            address.state,
-            address.complement,
-            address.latitude,
-            address.longitude,
-            address.area.id
-        ));
+        const addresses = await this.ormRepo.find();
+        return addresses.map(AddressMapper.toDomain);
     }
-
 }

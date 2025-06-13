@@ -6,8 +6,6 @@ import { UserNotFoundException } from "../Errors/UserNotFoundExeception";
 import { IUserRepository } from "src/Core/Domains/Repositories/user.repository";
 import { IEncriptService } from "src/Core/Domains/Services/encript.service";
 import { UserCreateInput } from "../Inputs/UserCreateInput";
-import { UserCreateOutput } from "../Output/UserCreateOutput";
-import { UserAuthOutput } from "../Output/UserAuthOutput";
 
 export class UserService {
     constructor(
@@ -20,7 +18,7 @@ export class UserService {
         const password = await this.encriptService.encript(userData.password);
         const userModel = new UserModel(userData.name, userData.email, password);
         const user = await this.userRepo.create(userModel);
-        return new UserCreateOutput(user);
+        return user;
     }
 
     async profile(userId:number){
@@ -29,9 +27,7 @@ export class UserService {
         if(!user)
             throw new UserNotFoundException();
 
-        const userModel = new UserModel(user.name, user.email, user.password, user.id, user.cellphone);
-
-        return new UserCreateOutput(userModel)
+        return user
     }
 
     async changePassword(userId:number,newPassword:string)
@@ -40,8 +36,8 @@ export class UserService {
         const user = await this.userRepo.updatePassword(userId,password);
         if(!user)
             throw new UserNotFoundException();
-        const userModel = new UserModel(user.name, user.email, user.password, user.id);
-        return new UserCreateOutput(userModel);
+    
+        return user;
     }
 
     async authenticate(email:string, password:string) {
@@ -61,6 +57,6 @@ export class UserService {
             id:user.id
         });
         user.setToken(token);
-        return new UserAuthOutput(user.name, user.email, token);
+        return {token,user};
     }
 }

@@ -2,6 +2,7 @@ import { UserModel } from 'src/Core/Domains/Models/user.model';
 import { IUserRepository } from '../../../Core/Domains/Repositories/user.repository';
 import { Repository } from 'typeorm';
 import { User } from '../Schemas/user.schema';
+import { GuestModel } from '@domain/Models/guest.model';
 
 export class UserRepositoryTypeORM implements IUserRepository {
     constructor(
@@ -47,6 +48,15 @@ export class UserRepositoryTypeORM implements IUserRepository {
             return null;
 
         return new UserModel(user.name, user.email, user.password, user.id, user.cellphone);
+    }
+
+    async findGuestById(guestId: number): Promise<GuestModel | null> {
+        const user  = await this.findById(guestId);
+
+        if(!user)
+            return null
+
+        return new GuestModel(user?.name,user?.email,"",user?.id,user.cellphone)
     }
 
     async findAll(): Promise<UserModel[]> {

@@ -1,13 +1,11 @@
 
 import { IsNull, Not, Repository } from 'typeorm';
-import { Address } from '../Schemas/address.schema';
 import { IAreaRepository } from '@domain/Repositories/area.repository';
 import { Area } from '../Schemas/area.schema';
 import { IUserRepository } from '@domain/Repositories/user.repository';
 import { AreaModel } from '@domain/Models/area.model';
+import { AreaMapper } from '../Mappers/AreaMapper';
 
-
-interface AreaWithAddress extends Omit<Area , "address">,Omit<Address , "id">{}
 export class AreaRepositoryTypeORM implements IAreaRepository {
     constructor(
         private ormRepo:Repository<Area>,
@@ -15,41 +13,24 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
     ){}
 
     async create(data:AreaModel):Promise<AreaModel>{
-        const model = this.ormRepo.create({
-            ...data,
-            address:data.address
-        }); 
-
+        
+        const model = AreaMapper.toORM(data);
         const area =  await this.ormRepo.save(model)
-            
-        return new AreaModel(
-            area.name,
-            area.rent,
-            area.createdAt,
-            area.updatedAt,
-            area.id
-        )
-        .setAddress(area.address)
-        .setOwner(data.owner);
+        return AreaMapper.toDomain(area)
     }  
     
     async update(id:number,data:AreaModel){
 
-        await this.ormRepo.update({id},{...data});
+         const {schedule,address,...areaData} = data
+
+        await this.ormRepo.update({id},{...areaData});
 
         const updatedArea = await this.findById(id)
 
          if(!updatedArea)
             throw new Error("Area not found!")
 
-        return new AreaModel(
-            updatedArea.name,
-            updatedArea.rent,
-            updatedArea.createdAt,
-            updatedArea.updatedAt,
-            updatedArea.id
-        )
-        .setAddress(updatedArea.address);
+        return updatedArea
     }
 
     async delete(id: number): Promise<boolean> {
@@ -65,50 +46,22 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
         if(!area)
             return null;
 
-
-        return new AreaModel(
-            area.name,
-            area.rent,
-            area.createdAt,
-            area.updatedAt,
-            area.id
-        )
-        .setAddress(area.address)
-        .setOwner(area.owner ?? {});
+        return AreaMapper.toDomain(area)
     }
 
     async findAll(): Promise<AreaModel[]> {
         const areas = await this.ormRepo.find();
-        return areas
-            .map(area => new AreaModel(
-                area.name,
-                area.rent, 
-                area.createdAt,
-                area.updatedAt,
-                area.id
-        ));
+        return areas.map(area => AreaMapper.toDomain(area));
     }
 
     async findByOwnerId(ownerId: number): Promise<AreaModel[]> {
 
         const areas = await this.ormRepo.find({
-            relations: { address: true },
-            where: { owner:{id:ownerId},address: { id: Not(IsNull()) } }
+            relations: { address: true,owner:true},
+            where: { owner:{id:ownerId} }
         });
 
-        const owner = await this.userRepo.findById(ownerId)
-
-        return areas.map(area =>{
-            return new AreaModel(
-                area.name,
-                area.rent, 
-                area.createdAt,
-                area.updatedAt,
-                area.id
-            ) 
-            .setOwner(owner ?? {})
-            .setAddress(area.address)
-        })
+        return areas.map(area =>AreaMapper.toDomain(area))
         
     }
 

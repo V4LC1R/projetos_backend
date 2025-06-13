@@ -1,7 +1,7 @@
 import { AreaModel } from "./area.model"
 
 export class AddressModel {
-    id?:number
+    id:number
     country:string
     street:string
     city:string
@@ -24,7 +24,6 @@ export class AddressModel {
         latitude: string,
         longitude: string,
         area_id:number,
-        id?:number
     ) {
         this.number_place = number_place,
         this.district = district;
@@ -36,7 +35,15 @@ export class AddressModel {
         this.latitude = latitude;
         this.longitude = longitude;
         this.areaId = area_id;
-        this.id = id ?? 0
     }
 
+    setId(id:number){
+        this.id =id;
+        return this
+    }
+
+    setAreaId(id:number){
+         this.areaId =id;
+        return this
+    }
 }

@@ -1,5 +1,7 @@
 import { AreaModel } from "./area.model";
 import { GuestModel } from "./guest.model";
+import { ScheduleModel } from "./schedule.model";
+import { UserModel } from "./user.model";
 
 export enum EventTypeEnum{
     SIMPLE = 1,
@@ -8,29 +10,38 @@ export enum EventTypeEnum{
 }
 
 export class EventModel {
-    id?:number;
+    id:number;
     name:string
+    areaId:number
+    guestId:number
     type:EventTypeEnum
-    area:AreaModel
-    guest:GuestModel
+    schedule:ScheduleModel[]
 
     constructor(
         name:string,
         type:EventTypeEnum,
-        id?:number
     ){
         this.name = name;
         this.type = type;
-        this.id = id;
     }
 
-    setArea(area: AreaModel){
-        this.area = area
+    setId(id:number){
+        this.id =id
+        return this
+    }
+
+    setSchedule(schedule:ScheduleModel[]){
+        this.schedule =schedule
+        return this
+    }
+
+    setArea(areaId: number){
+        this.areaId = areaId
         return this;
     }
 
-    setGuest(guest: GuestModel){
-        this.guest = guest
+    setGuest(guestId: number){
+        this.guestId = guestId
         return this;
     }
 }

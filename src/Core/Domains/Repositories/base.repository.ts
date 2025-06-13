@@ -1,5 +1,5 @@
 export interface IBaseRepository<T> {
-    create(data: any): Promise<T>;
+    create(data:T): Promise<T>;
     update(id:number,data: any): Promise<T>;
     delete(id: number): Promise<boolean>;
     findById(id: number): Promise<T | null>;

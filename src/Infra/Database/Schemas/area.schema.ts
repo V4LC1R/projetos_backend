@@ -33,7 +33,7 @@ export class Area {
     @ManyToOne(() => User, (user) => user.area)
     owner: User
 
-    @OneToOne(() => Address, (address) => address.area,{ eager: true })
+    @OneToOne(() => Address, (address) => address.area)
     public address: Address
 
     @OneToMany(() => Event, event => event.area,{ eager: true })

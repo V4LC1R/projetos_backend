@@ -11,8 +11,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - dbdata:/var/lib/postgresql/data
-      - ./.docker/database/init:/docker-entrypoint-initdb.d
+      - hora_extra-db_data:/var/lib/postgresql/data
     networks:
       - hora_extra-network
     
@@ -21,5 +20,5 @@ networks:
     driver: bridge
 
 volumes:
-  dbdata:
+  hora_extra-db_data:
     driver: local
