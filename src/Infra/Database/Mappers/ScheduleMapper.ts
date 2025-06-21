@@ -1,6 +1,6 @@
  // se precisar mapear área
 
-import { ScheduleModel } from "@domain/Models/schedule.model";
+import { AvailabilityStatus, ScheduleModel } from "@domain/Models/schedule.model";
 import { Schedule } from "../Schemas/schedule.schema";
 import { Area } from "../Schemas/area.schema";
 import { Event } from "../Schemas/event.schema";
@@ -8,7 +8,7 @@ import { Event } from "../Schemas/event.schema";
 export class ScheduleMapper {
 
   static toDomain(schedule: Schedule): ScheduleModel {
-    console.log(schedule)
+
     const model = new ScheduleModel(
       schedule.start_time,
       schedule.end_time,
@@ -34,7 +34,7 @@ static toORM(domain: ScheduleModel): Schedule {
   orm.end_time = ScheduleMapper.formatToDate(domain.end_time);
   orm.date = ScheduleMapper.formatToDate(domain.date);
 
-  orm.status = orm.status ?? 'unavailable';
+  orm.status = orm.status ?? AvailabilityStatus.AVAILABLE;
   orm.area = { id: domain.areaId } as Area;
 
   if(domain.eventId)

@@ -6,8 +6,8 @@ import { OwnerModel } from "@domain/Models/owner.model";
 import { ScheduleModel } from "@domain/Models/schedule.model";
 
 export class AreaBuilder {
-  name: string = '';
-  rent: number = 0;
+  name: string ;
+  rent: number ;
   address: AddressModel;
   schedule: ScheduleModel[] = [];
   owner:OwnerModel
@@ -73,6 +73,7 @@ export class AreaBuilder {
   }
 
   public build(): AreaModel {
+    
     return new AreaModel(this.name, this.rent,new Date(),new Date())
         .setAddress(this.address)
         .setOwner(this.owner.ownerId)
@@ -81,6 +82,7 @@ export class AreaBuilder {
   }
 
   static fill(input:AreaCreateInput){
+    console.log('<><>?',input.rent)
     return new AreaBuilder()
       .setName(input.name)
       .setRent(input.rent)

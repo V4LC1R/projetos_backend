@@ -26,6 +26,7 @@ import { Event } from "src/Infra/Database/Schemas/event.schema";
 import { EventAreaService } from "src/Core/App/Services/event.service";
 import { ScheduleRepositoryTypeORM } from "@infra/Database/Repositories/schedule.repository-typeorm";
 import { Schedule } from "@infra/Database/Schemas/schedule.schema";
+import { Category } from "@infra/Database/Schemas/category.schema";
 
 const controllers = [
     AuthController,
@@ -77,11 +78,12 @@ const coreServices = [
 
 const repositories = [
     {
-      inject:[getDataSourceToken(),UserRepositoryTypeORM],
+      inject:[getDataSourceToken(),UserRepositoryTypeORM,],
       provide:AreaRepositoryTypeORM,
       useFactory:(dataSource:DataSource,userRepo:UserRepositoryTypeORM)=>{
         return new AreaRepositoryTypeORM(
           dataSource.getRepository(Area),
+          dataSource.getRepository(Category),
           userRepo
         )
       }

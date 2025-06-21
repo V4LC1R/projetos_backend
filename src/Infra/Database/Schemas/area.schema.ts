@@ -15,6 +15,7 @@ import { Event } from './event.schema';
 import { Address } from './address.schema';
 import { ActiveStatusEnum } from '@shared/Visibility';
 import { Category } from './category.schema';
+import { Request } from './request.schema';
 
 @Entity()
 export class Area {
@@ -48,6 +49,9 @@ export class Area {
 
     @OneToMany(() => Schedule, event => event.area,{ eager: true })
     public schedule: Schedule[];
+
+    @OneToMany(() => Request, request => request.area)
+    public requests: Request[];
 
     @ManyToMany(() => Category, (category) => category.areas, { eager: true })
     @JoinTable({

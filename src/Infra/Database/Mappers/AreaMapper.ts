@@ -10,7 +10,7 @@ export class AreaMapper {
   static toDomain(area: Area): AreaModel {
     const domain = new AreaModel(
       area.name,
-      Number(area.rent),    // rent é decimal, converte para number
+      area.rent,    // rent é decimal, converte para number
       area.createdAt,
       area.updatedAt,
     );
@@ -38,6 +38,8 @@ export class AreaMapper {
   static toORM(domain: AreaModel): Area {
 
     const orm = new Area();
+
+    
 
     orm.id = domain.id;
     orm.name = domain.name;

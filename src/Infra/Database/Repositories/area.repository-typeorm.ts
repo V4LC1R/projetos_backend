@@ -1,21 +1,27 @@
 
-import { IsNull, Not, Repository } from 'typeorm';
-import { IAreaRepository } from '@domain/Repositories/area.repository';
+import { Repository } from 'typeorm';
+import { AreaWithDistanceAndAvailability, IAreaRepository } from '@domain/Repositories/area.repository';
 import { Area } from '../Schemas/area.schema';
 import { IUserRepository } from '@domain/Repositories/user.repository';
 import { AreaModel } from '@domain/Models/area.model';
 import { AreaMapper } from '../Mappers/AreaMapper';
 import { ActiveStatusEnum } from '@shared/Visibility';
+import { Category } from '../Schemas/category.schema';
+import { CategoryModel } from '@domain/Models/category.model';
+import { CategoryMapper } from '../Mappers/CategoryMapper';
+import { AvailabilityStatus } from '@domain/Models/schedule.model';
 
 export class AreaRepositoryTypeORM implements IAreaRepository {
     constructor(
         private ormRepo:Repository<Area>,
+        private category:Repository<Category>,
         private userRepo:IUserRepository,
     ){}
 
     async create(data:AreaModel):Promise<AreaModel>{
         
         const model = AreaMapper.toORM(data);
+        console.log('>>',model)
         const area =  await this.ormRepo.save(model)
         return AreaMapper.toDomain(area)
     }  
@@ -47,7 +53,7 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
         
         if(!area)
             return null;
-
+        
         return AreaMapper.toDomain(area)
     }
 
@@ -72,42 +78,70 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
         lat: number,
         lng: number,
         distance: number,
-        categoryId?:number[]
-    ): Promise<any[]> {
+        categoryId?: number[]
+    ): Promise<AreaWithDistanceAndAvailability[]> {
         const qb = this.ormRepo
             .createQueryBuilder("areas")
             .innerJoin("areas.address", "address")
+            .innerJoin("areas.owner", "owner")
             .select([
-                "areas.id AS area_id",
-                "areas.name AS area_name",
-                "address.id AS address_id",
-                "address.street AS street",
+                "areas.id AS areas_id",
+                "areas.rent AS areas_rent",
+                "areas.name AS areas_name",
+                "owner.name AS ownerName",
+                "address.district AS address_district",
+                "address.number_place AS address_number_place",
+                "address.city AS address_city",
                 "address.latitude AS latitude",
                 "address.longitude AS longitude",
             ])
             .addSelect(`
                 (
                     6371 * acos(
-                    cos(radians(:lat)) * cos(radians(address.latitude)) *
-                    cos(radians(address.longitude) - radians(:lng)) +
-                    sin(radians(:lat)) * sin(radians(address.latitude))
-                )
-            )
+                        cos(radians(:lat)) * cos(radians(address.latitude)) *
+                        cos(radians(address.longitude) - radians(:lng)) +
+                        sin(radians(:lat)) * sin(radians(address.latitude))
+                    )
+                ) 
             `, "distance")
-            .where("areas.active = :active", { active: ActiveStatusEnum.ACTIVE })
-            .having("distance < :distance", { distance })
+            .addSelect(qbSub => {
+                return qbSub
+                    .select("COUNT(*)")
+                    .from("schedule", "s")
+                    .where("s.areaId = areas.id")
+                    .andWhere("s.status = :availableStatus")
+                    .andWhere("s.active = :activeStatus")
+                    .andWhere("s.eventId IS NULL");
+            }, "availableSchedules")
+            .where("areas.active = :activeStatus")
+            .andWhere(`
+                (
+                    6371 * acos(
+                        cos(radians(:lat)) * cos(radians(address.latitude)) *
+                        cos(radians(address.longitude) - radians(:lng)) +
+                        sin(radians(:lat)) * sin(radians(address.latitude))
+                    )
+                ) < :distance
+            `)
             .orderBy("distance", "ASC")
-            .setParameters({ lat, lng });
+            .distinct(true);
 
         if (categoryId?.length) {
             qb.innerJoin("areas.categories", "categories")
-            .andWhere("categories.id IN (:...categoryIds)", { categoryId })
+            .andWhere("categories.id IN (:...categoryId)");
         }
 
-        const result = await qb.getRawMany();
-        return result;
-    }
+        qb.setParameters({
+            lat,
+            lng,
+            distance,
+            activeStatus: ActiveStatusEnum.ACTIVE,
+            availableStatus: AvailabilityStatus.AVAILABLE,
+            categoryId,
+        });
 
+        return qb.getRawMany();
+    }
 
     async isOwner(ownerId: number, areaId: number): Promise<boolean> {
         return await this
@@ -120,5 +154,10 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
                         active:ActiveStatusEnum.ACTIVE
                     }
                 })
+    }
+
+    async getCategories(): Promise<CategoryModel[]> {
+        const categories = await this.category.find()
+        return categories.map(c=>CategoryMapper.toDomain(c))
     }
 }

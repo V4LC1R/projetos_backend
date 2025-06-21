@@ -15,8 +15,8 @@ export class AddressMapper {
       address.city,
       address.state,
       address.complement,
-      address.latitude,
-      address.longitude,
+      String(address.latitude),
+      String(address.longitude),
       address.area?.id || 0,
     );
 
@@ -38,8 +38,8 @@ export class AddressMapper {
     orm.city = domain.city;
     orm.state = domain.state;
     orm.complement = domain.complement;
-    orm.latitude = domain.latitude;
-    orm.longitude = domain.longitude;
+    orm.latitude = parseFloat(domain.latitude);
+    orm.longitude =parseFloat(domain.longitude);
 
     if(domain.areaId){
       orm.area = {id:domain.areaId} as Area; // ou pode chamar um mapper da Area se tiver

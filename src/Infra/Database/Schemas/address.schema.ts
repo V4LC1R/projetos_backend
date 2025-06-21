@@ -27,11 +27,11 @@ export class Address {
     @Column({ type:'text'})
     complement:string
 
-    @Column({type:"varchar",length:255})
-    latitude:string
+    @Column({ type: 'decimal', precision: 10, scale: 8 })
+    latitude: number;
 
-    @Column({type:"varchar",length:255})
-    longitude:string
+    @Column({ type: 'decimal', precision: 11, scale: 8 })
+    longitude: number;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

@@ -25,11 +25,26 @@ export class AreaController {
             .edit(id,req.user.id,areaDto)
     }
 
+
+    @Get('/categories')
+    async getAreasCategoryes(){
+        return await this
+            .areaService
+            .getCategories();
+    }
+
     @Get('/my-areas')
     async getByOwner(@Request() req){
         return await this
             .areaService
             .getAllByOwner(req.user.id);
+    }
+
+    @Get('/by-position')
+    async getByPosition(@Query() query: FindByCoordinatesDto){
+        return await this
+            .areaService
+            .getByPosition(query.lat, query.lng, query.distance,query.categoryId);
     }
 
     @Get('/:id')
@@ -45,12 +60,4 @@ export class AreaController {
             .areaService
             .delete(id,req.user.id);
     }
-
-    @Get('/by-position')
-    async getByPosition(@Query() query: FindByCoordinatesDto){
-        return await this
-            .areaService
-            .getByPosition(query.lat, query.lng, query.distance,query.categoryId);
-    }
-
 }

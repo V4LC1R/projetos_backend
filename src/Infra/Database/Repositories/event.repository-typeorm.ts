@@ -63,7 +63,7 @@ export class EventRepositoryTypeORM implements IEventRepository {
     }
 
     async eventsByAreaId(areaId: any, ownerId: any): Promise<EventModel[]> {
-        console.log(areaId,ownerId)
+
         const events = await this
             .ormRepo
             .find({
@@ -81,8 +81,6 @@ export class EventRepositoryTypeORM implements IEventRepository {
                     active:ActiveStatusEnum.ACTIVE
                 }
             })
-
-        console.log(events)
             
         return events
             .map((event)=>EventMapper.toDomain(event)

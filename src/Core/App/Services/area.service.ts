@@ -12,15 +12,17 @@ export class AreaService {
     constructor(
         private readonly areaRepo:IAreaRepository,
         private readonly addressRepo:IAddressRepository,
-        private readonly scheduleRepo:IScheduleRepository
+        private readonly scheduleRepo:IScheduleRepository,
     ) {}
 
     async create(owner_id:number,areaData:AreaCreateInput) {
+        
         const createAreaPayload = new  AreaBuilder()
+            .setRent(areaData.rent)
             .setName(areaData.name)
             .setOwner({id:owner_id})
-            .setCategories(areaData.categories);
-        
+            .setCategories(areaData.categories)
+       
         const area = await this.areaRepo.create(createAreaPayload.build());
         if(!area.id)
             throw new Error('Something went wrong on creating area');
@@ -77,13 +79,17 @@ export class AreaService {
         return areas;
     }
 
-    async getByPosition(lat:number, lng:number, distance:number,categoryId?:number[]) {
-        const areas = await this.areaRepo.findByCoordinates(lat,lng,distance,categoryId);
+    async getByPosition(lat:string, lng:string, distance:number,categoryId?:number[]) {
+        const areas = await this.areaRepo.findByCoordinates(parseFloat(lat),parseFloat(lng),distance,categoryId);
         return areas
     }
 
     async getById(areaId:number){
         const area = await this.areaRepo.findById(areaId);
         return area
+    }
+
+    async getCategories(){
+        return await this.areaRepo.getCategories()
     }
 }

@@ -7,6 +7,7 @@ import {
 import { Event } from './event.schema';
 import { Area } from './area.schema';
 import { ActiveStatusEnum } from '@shared/Visibility';
+import { Request } from './request.schema';
 
 @Entity()
 export class User {
@@ -40,4 +41,7 @@ export class User {
 
     @OneToMany(() => Area, area => area.owner)
     public area: Area[];
+
+    @OneToMany(() => Request, request => request.owner)
+    public requests: Request[];
 }

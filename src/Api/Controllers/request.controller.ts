@@ -2,19 +2,19 @@ import { CreateEventInputDTO } from '@api/DTO/create-event.input.dto';
 import { EventAreaService } from '@app/Services/event.service';
 import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
 
-@Controller('event')
+@Controller('request')
 export class EventController {
     constructor(
         private readonly eventService : EventAreaService
     ){}
 
-    @Get('/my-events')
+    @Get('/my-requests')
     async getEvents(@Req() req) {
          return await this
             .eventService.myEvents(req.user.id)
     }
 
-    @Get('/area-events/:id')
+    @Get('/area-request/:id')
     async getEventsByArea(@Param('id') id,@Req() req) {
         return await this
             .eventService
@@ -42,7 +42,7 @@ export class EventController {
             .deleteForGuest(id,req.user.id);
     }
 
-    @Delete('/owner-area/:id')
+    @Delete('/owner-request/:id')
     async deleteOwnerArea(@Param('id') id,@Req() req){
         return await this
             .eventService

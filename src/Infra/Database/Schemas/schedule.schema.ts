@@ -5,7 +5,9 @@ import {
     OneToMany,
     OneToOne,
     ManyToOne,
-    JoinColumn
+    JoinColumn,
+    ManyToMany,
+    JoinTable
 } from 'typeorm';
 
 import { Area } from './area.schema';
@@ -13,6 +15,7 @@ import { Event } from './event.schema';
 import { User } from './user.schema';
 import { AvailabilityStatus } from '@domain/Models/schedule.model';
 import { ActiveStatusEnum } from '@shared/Visibility';
+import { Request } from './request.schema';
 
 @Entity()
 export class Schedule {
@@ -35,7 +38,7 @@ export class Schedule {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
-    @Column({type:'varchar',default:AvailabilityStatus.UNAVAILABLE})
+    @Column({type:'varchar',default:AvailabilityStatus.AVAILABLE})
     status: AvailabilityStatus;
 
     @Column({ type: 'int' ,default:ActiveStatusEnum.ACTIVE})
@@ -45,11 +48,11 @@ export class Schedule {
     @JoinColumn({ name: 'eventId' })
     event?: Event;
 
+    @ManyToMany(() => Request, request => request.schedules)
+    public requests?: Request[];
+
     @ManyToOne(() => Area, (area) => area.events)
     @JoinColumn()
     public area: Area
 
-    @ManyToOne(() => User, (user) => user.events)
-    @JoinColumn()
-    public guest: User
 }
