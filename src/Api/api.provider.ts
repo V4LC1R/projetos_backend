@@ -1,3 +1,4 @@
+import { RequestRepositoryTypeORM } from './../Infra/Database/Repositories/request.repository-typeorm';
 import { getDataSourceToken } from "@nestjs/typeorm";
 //schemas
 import { Area } from "src/Infra/Database/Schemas/area.schema";
@@ -27,11 +28,15 @@ import { EventAreaService } from "src/Core/App/Services/event.service";
 import { ScheduleRepositoryTypeORM } from "@infra/Database/Repositories/schedule.repository-typeorm";
 import { Schedule } from "@infra/Database/Schemas/schedule.schema";
 import { Category } from "@infra/Database/Schemas/category.schema";
+import { Request } from '@infra/Database/Schemas/request.schema';
+import { RequestService } from '@app/Services/request.service';
+import { RequestController } from './Controllers/request.controller';
 
 const controllers = [
     AuthController,
     EventController,
-    AreaController
+    AreaController,
+    RequestController
 ]
 
 const infraServices = [
@@ -73,7 +78,14 @@ const coreServices = [
         useFactory:(areaRepo:AreaRepositoryTypeORM,addressRepo:AddressRepositoryTypeORM,scheduleRepo:ScheduleRepositoryTypeORM)=>{
             return new AreaService(areaRepo,addressRepo,scheduleRepo)
         }
-    }
+    },
+    {
+        inject:[RequestRepositoryTypeORM,AreaRepositoryTypeORM,UserRepositoryTypeORM],
+        provide:RequestService,
+        useFactory:(mainRepo:RequestRepositoryTypeORM,areaRepo:AreaRepositoryTypeORM,userRepo:UserRepositoryTypeORM)=>{
+            return new RequestService(mainRepo,areaRepo,userRepo)
+        }
+    },
 ]
 
 const repositories = [
@@ -123,7 +135,16 @@ const repositories = [
                 dataSource.getRepository(Schedule)
             )
         }
-    }
+    },
+     {
+        inject:[getDataSourceToken()],
+        provide:RequestRepositoryTypeORM,
+        useFactory:(dataSource:DataSource)=>{
+            return new RequestRepositoryTypeORM(
+                dataSource.getRepository(Request)
+            )
+        }
+    },
 ]
 
 export const APIProvider = {

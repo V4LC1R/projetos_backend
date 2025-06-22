@@ -1,0 +1,114 @@
+import { Repository } from 'typeorm';
+import { ActiveStatusEnum } from '@shared/Visibility';
+import { IRequestRepository } from '@domain/Repositories/request.repository';
+import { RequestModel, StatusRequestEnum } from '@domain/Models/request.model';
+import { Request } from '../Schemas/request.schema';
+import { RequestMapper } from '../Mappers/RequestMapper';
+
+export class RequestRepositoryTypeORM implements IRequestRepository {
+    constructor(
+        private ormRepo:Repository<Request>
+    ){}
+
+    async create(data:RequestModel):Promise<RequestModel>{
+        const model = RequestMapper.toORM(data)
+
+        const request =  await this.ormRepo.save(model);
+        return RequestMapper.toDomain(request);
+    }  
+    
+    async update(id:number,data:RequestModel):Promise<RequestModel>{
+        await this.ormRepo.update({id},RequestMapper.toORM(data));
+
+        const request = await this.findById(id);
+        if(!request) 
+            throw new Error("User not found");
+
+         return request
+    }
+
+    async delete(id: number): Promise<boolean> {
+        return !await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
+    }
+
+    async findById(id: number): Promise<RequestModel | null> {
+        const request = await this.ormRepo.findOne(
+            {
+                relations:{schedules:true},
+                where:{id,active:ActiveStatusEnum.ACTIVE}
+            }
+        );
+        if(!request)
+            return null;
+
+        return RequestMapper.toDomain(request);
+    }
+
+    async findAll(): Promise<RequestModel[]> {
+        const requests = await this.ormRepo.find();
+        return requests.map(request => RequestMapper.toDomain(request));
+    }
+
+    async requestMyAreas(ownerAreaId: number): Promise<RequestModel[]> {
+        const requests = await this.ormRepo.find({
+            relations:{
+                schedules:true,
+                owner:true,
+                area:{categories:true}
+            },
+            where:{
+                area:{
+                    owner:{id:ownerAreaId}
+                }
+            }
+        })
+
+        return requests.map(request => RequestMapper.toDomain(request));
+    }
+
+    async requestByAreaId(areaId: any, ownerId: number): Promise<RequestModel[]> {
+        const requests = await this.ormRepo.find({
+            relations:{
+                schedules:true,
+                owner:true,
+                area:{categories:true}
+            },
+            where:{
+                area:{
+                    id:areaId,
+                    owner:{id:ownerId}
+                }
+            }
+        })
+
+        return requests.map(request => RequestMapper.toDomain(request));
+    }
+
+    async myRequests(ownerId: number): Promise<RequestModel[]> {
+         const requests = await this.ormRepo.find({
+            relations:{
+                schedules:true,
+                owner:true,
+                area:{categories:true}
+            },
+            where:{
+               owner:{id:ownerId}
+            }
+        })
+
+        return requests.map(request => RequestMapper.toDomain(request));
+    }
+
+    async aceptRequest(requestId: number): Promise<boolean> {
+        const {generatedMaps} = await this.ormRepo.update(requestId,{status:StatusRequestEnum.ACEPT})
+
+        return generatedMaps.length > 0
+    }
+
+    async rejectRequest(requestId: number): Promise<boolean> {
+        const {generatedMaps} = await this.ormRepo.update(requestId,{status:StatusRequestEnum.REJECT})
+
+        return generatedMaps.length > 0
+    }
+
+}

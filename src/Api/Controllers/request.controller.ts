@@ -1,51 +1,44 @@
-import { CreateEventInputDTO } from '@api/DTO/create-event.input.dto';
-import { EventAreaService } from '@app/Services/event.service';
+import { CreateRequestInputDTO } from '@api/DTO/create-request.dtp';
+import { RequestService } from '@app/Services/request.service';
 import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
 
 @Controller('request')
-export class EventController {
+export class RequestController {
     constructor(
-        private readonly eventService : EventAreaService
+        private readonly requestService : RequestService
     ){}
 
     @Get('/my-requests')
     async getEvents(@Req() req) {
          return await this
-            .eventService.myEvents(req.user.id)
+            .requestService.myRequests(req.user.id)
     }
 
     @Get('/area-request/:id')
     async getEventsByArea(@Param('id') id,@Req() req) {
         return await this
-            .eventService
-            .eventsByArea(id,req.user.id);
+            .requestService
+            .requestByArea(id,req.user.id);
     }
 
     @Post('/')
-    async createEvent(@Req() req, @Body() body:CreateEventInputDTO) {
+    async createEvent(@Req() req, @Body() body:CreateRequestInputDTO) {
         return await this
-            .eventService
+            .requestService
             .create({...body,ownerId:req.user.id});
     }
 
-    @Put('/:id')
-    async update(@Param('id') id:number, @Req() req, @Body() body:CreateEventInputDTO) {
-        return await this
-            .eventService
-            .update(id,req.user.id,{...body});
-    }
-
-    @Delete('/guest/:id')
+    @Put('/owner-acept/id')
     async deleteGuest(@Param('id') id,@Req() req){
         return await this
-            .eventService
-            .deleteForGuest(id,req.user.id);
+            .requestService
+            .acept(id,req.user.id);
     }
 
-    @Delete('/owner-request/:id')
+    @Put('/owner-reject/:id')
     async deleteOwnerArea(@Param('id') id,@Req() req){
         return await this
-            .eventService
-            .deleteForOwnerArea(id,req.user.id);
+            .requestService
+            .reject(id,req.user.id);
     }
 }

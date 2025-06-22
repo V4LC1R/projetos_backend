@@ -5,6 +5,7 @@ import { JWTMiddleware } from '../Infra/Http/Middlewares/JWTMiddleware';
 import { AreaController } from './Controllers/area.controller';
 import { EventController } from './Controllers/event.controller';
 import { AuthController } from './Controllers/auth.controller';
+import { RequestController } from './Controllers/request.controller';
 @Module({
   imports: [],
   providers: APIProvider.services,
@@ -21,7 +22,8 @@ export class ApiModule {
       .forRoutes(
         AreaController,
         EventController,
-        AuthController
+        AuthController,
+        RequestController
       )
   }
 }

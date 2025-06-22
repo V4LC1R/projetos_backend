@@ -80,5 +80,10 @@ export class ScheduleRepositoryTypeORM implements IScheduleRepository {
 
         return validate <= 0
     }
+
+    async releaseSchedules(schedules: number[]): Promise<boolean> {
+        const {affected} = await this.ormRepo.update(schedules,{status:AvailabilityStatus.AVAILABLE});
+        return affected ? affected > 0 : false
+    }
         
 }

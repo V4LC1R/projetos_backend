@@ -1,14 +1,10 @@
 import { ScheduleModel } from "./schedule.model";
 
-export enum EventTypeEnum{
-    SIMPLE = 1,
-    TOURNAMENT = 2,
-    PARTY = 3
-}
-
-export enum EventStatusEnum{
-    ACTIVE = 1,
-    INACTIVE = 2
+export enum StatusRequestEnum {
+    AWAIT= 0,
+    ACEPT= 1,
+    REJECT=2,
+    CANCELED=3
 }
 
 export class RequestModel {

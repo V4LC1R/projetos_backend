@@ -42,6 +42,10 @@ export class RequestMapper {
       entity.owner ={id:domain.ownerId} as User; // Guest é um tipo de User
     }
 
+    if(domain.schedule && domain.schedule.length > 0){
+        entity.schedules = domain.schedule.map(s=>ScheduleMapper.toORM(s))
+    }
+
     return entity;
   }
 }

@@ -12,6 +12,7 @@ import { User } from './user.schema';
 import { Area } from './area.schema';
 import { Schedule } from './schedule.schema';
 import { ActiveStatusEnum } from '@shared/Visibility';
+import { StatusRequestEnum } from '@domain/Models/request.model';
 
 @Entity()
 export class Request {
@@ -24,6 +25,9 @@ export class Request {
 
     @Column({ type: 'int' ,default:ActiveStatusEnum.ACTIVE})
     active:ActiveStatusEnum
+
+    @Column({ type: 'int' ,default:StatusRequestEnum.AWAIT})
+    status:StatusRequestEnum
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
