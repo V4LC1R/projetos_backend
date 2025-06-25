@@ -71,7 +71,7 @@ export class RequestRepositoryTypeORM implements IRequestRepository {
             relations:{
                 schedules:true,
                 owner:true,
-                area:{categories:true}
+                area:true
             },
             where:{
                 area:{
@@ -87,12 +87,29 @@ export class RequestRepositoryTypeORM implements IRequestRepository {
     async myRequests(ownerId: number): Promise<RequestModel[]> {
          const requests = await this.ormRepo.find({
             relations:{
-                schedules:true,
                 owner:true,
-                area:{categories:true}
+                schedules:true,
+                area:{schedule:false,categories:true},
             },
             where:{
                owner:{id:ownerId}
+            }
+        })
+
+        return requests.map(request => RequestMapper.toDomain(request));
+    }
+
+    async toOwner(ownerId: number): Promise<RequestModel[]> {
+        const requests = await this.ormRepo.find({
+            relations:{
+                schedules:true,
+                owner:true,
+                area:true
+            },
+            where:{
+                area:{
+                    owner:{id:ownerId}
+                }
             }
         })
 

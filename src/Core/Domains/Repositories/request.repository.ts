@@ -7,4 +7,5 @@ export interface IRequestRepository extends IBaseRepository<RequestModel> {
     requestMyAreas(ownerAreaId:number):Promise<RequestModel[]>
     aceptRequest(requestId:number):Promise<boolean>
     rejectRequest(requestId:number):Promise<boolean>
+    toOwner(ownerId:number):Promise<RequestModel[]>
 }

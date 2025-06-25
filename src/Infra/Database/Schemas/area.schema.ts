@@ -44,10 +44,10 @@ export class Area {
     @OneToOne(() => Address, (address) => address.area)
     public address: Address
 
-    @OneToMany(() => Event, event => event.area,{ eager: true })
+    @OneToMany(() => Event, event => event.area)
     public events: Event[];
 
-    @OneToMany(() => Schedule, event => event.area,{ eager: true })
+    @OneToMany(() => Schedule, event => event.area)
     public schedule: Schedule[];
 
     @OneToMany(() => Request, request => request.area)

@@ -25,8 +25,8 @@ export class RequestService {
         const schedules = data.schedules.map(e=>new ScheduleBuilder().fill({id:e}))
 
         const requestModel = new RequestModel(data.message)
-            .setArea(data.areaId)
-            .setGuest(data.ownerId)
+            .setArea(area)
+            .setGuest(guest)
             .setSchedule(schedules)
 
         const request = await this.requestRepo.create(requestModel)
@@ -34,6 +34,14 @@ export class RequestService {
         return request
 
     }   
+
+    async get(requestId:number){
+        return await this.requestRepo.findById(requestId)
+    }
+
+    async toOwner(ownerId:number){
+        return await this.requestRepo.toOwner(ownerId)
+    }
 
     async myRequests(userId:number){
         return await this.requestRepo.myRequests(userId)

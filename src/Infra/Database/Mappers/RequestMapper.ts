@@ -3,6 +3,8 @@ import { Area } from "../Schemas/area.schema";
 import { User } from "../Schemas/user.schema";
 import { RequestModel } from "@domain/Models/request.model";
 import { Request } from "../Schemas/request.schema";
+import { AreaMapper } from "./AreaMapper";
+import { UserMapper } from "./UserMapper";
 
 export class RequestMapper {
   static toDomain(event: Request): RequestModel {
@@ -12,11 +14,11 @@ export class RequestMapper {
       model.setId(event.id)
 
     if (event.area) {
-      model.setArea(event.area.id);
+      model.setArea(AreaMapper.toDomain(event.area));
     }
 
     if (event.owner) {
-      model.setGuest(event.owner.id);
+      model.setGuest(UserMapper.toGuestDomain(event.owner));
     }
 
     if (event.schedules && event.schedules.length > 0) {
@@ -34,12 +36,12 @@ export class RequestMapper {
     entity.createdAt = new Date(); // ou manter null e deixar o TypeORM criar
     entity.updatedAt = new Date();
 
-    if (domain.areaId) {
-      entity.area = {id:domain.areaId} as Area;
+    if (domain.area) {
+      entity.area = {id:domain.area.id} as Area;
     }
 
-    if (domain.ownerId) {
-      entity.owner ={id:domain.ownerId} as User; // Guest é um tipo de User
+    if (domain.owner) {
+      entity.owner ={id:domain.owner.id} as User; // Guest é um tipo de User
     }
 
     if(domain.schedule && domain.schedule.length > 0){

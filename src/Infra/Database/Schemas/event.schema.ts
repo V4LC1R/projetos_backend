@@ -35,8 +35,7 @@ export class Event {
     updatedAt: Date;
 
     @OneToMany(() => Schedule, schedule => schedule.event, {
-      cascade: true,
-      eager: false,
+      cascade: true
     })
     public schedules: Schedule[];
 

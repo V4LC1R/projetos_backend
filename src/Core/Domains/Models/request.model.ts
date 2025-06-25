@@ -1,4 +1,6 @@
 import { ScheduleModel } from "./schedule.model";
+import { AreaModel } from "./area.model";
+import { UserModel } from "./user.model";
 
 export enum StatusRequestEnum {
     AWAIT= 0,
@@ -10,8 +12,8 @@ export enum StatusRequestEnum {
 export class RequestModel {
     id:number;
     message:string
-    areaId:number
-    ownerId:number
+    area:AreaModel
+    owner:UserModel
     schedule:ScheduleModel[]
 
     constructor(
@@ -30,13 +32,13 @@ export class RequestModel {
         return this
     }
 
-    setArea(areaId: number){
-        this.areaId = areaId
+    setArea(area: AreaModel){
+        this.area = area
         return this;
     }
 
-    setGuest(ownerId: number){
-        this.ownerId = ownerId
+    setGuest(owner: UserModel){
+        this.owner = owner
         return this;
     }
 }

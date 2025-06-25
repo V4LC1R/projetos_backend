@@ -8,10 +8,23 @@ export class RequestController {
         private readonly requestService : RequestService
     ){}
 
+    @Post('/')
+    async createEvent(@Req() req, @Body() body:CreateRequestInputDTO) {
+        return await this
+            .requestService
+            .create({...body,ownerId:req.user.id});
+    }
+
     @Get('/my-requests')
     async getEvents(@Req() req) {
          return await this
             .requestService.myRequests(req.user.id)
+    }
+
+    @Get('/to-owner')
+    async fromArea(@Req() req) {
+         return await this
+            .requestService.toOwner(req.user.id)
     }
 
     @Get('/area-request/:id')
@@ -21,22 +34,22 @@ export class RequestController {
             .requestByArea(id,req.user.id);
     }
 
-    @Post('/')
-    async createEvent(@Req() req, @Body() body:CreateRequestInputDTO) {
+    @Get('/:id')
+    async show(@Param('id') id) {
         return await this
             .requestService
-            .create({...body,ownerId:req.user.id});
+            .get(id);
     }
 
-    @Put('/owner-acept/id')
-    async deleteGuest(@Param('id') id,@Req() req){
+    @Put('/owner-acept/:id')
+    async acept(@Param('id') id,@Req() req){
         return await this
             .requestService
             .acept(id,req.user.id);
     }
 
     @Put('/owner-reject/:id')
-    async deleteOwnerArea(@Param('id') id,@Req() req){
+    async reject(@Param('id') id,@Req() req){
         return await this
             .requestService
             .reject(id,req.user.id);
