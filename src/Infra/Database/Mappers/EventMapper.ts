@@ -20,8 +20,6 @@ export class EventMapper {
       model.setGuest(event.owner.id);
     }
 
-    console.log(event.schedules)
-
     if (event.schedules && event.schedules.length > 0) {
       model.setSchedule(event.schedules.map(s => ScheduleMapper.toDomain(s)));
     }

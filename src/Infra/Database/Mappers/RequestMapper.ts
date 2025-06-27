@@ -8,7 +8,7 @@ import { UserMapper } from "./UserMapper";
 
 export class RequestMapper {
   static toDomain(event: Request): RequestModel {
-    const model = new RequestModel(event.message, );
+    const model = new RequestModel(event.message);
 
     if(event.id)
       model.setId(event.id)
@@ -21,9 +21,11 @@ export class RequestMapper {
       model.setGuest(UserMapper.toGuestDomain(event.owner));
     }
 
+    console.log('>?',event.schedules)
     if (event.schedules && event.schedules.length > 0) {
       model.setSchedule(event.schedules.map(s => ScheduleMapper.toDomain(s)));
     }
+    console.log('<?',model.schedule)
 
     model
       .setStatus(event.status)
@@ -51,7 +53,7 @@ export class RequestMapper {
     }
 
     if(domain.schedule && domain.schedule.length > 0){
-        entity.schedules = domain.schedule.map(s=>ScheduleMapper.toORM(s))
+        entity.schedules = domain.schedule.map(s=>({id:s.id} as any)); // Convertendo ScheduleModel para Schedule
     }
 
     return entity;

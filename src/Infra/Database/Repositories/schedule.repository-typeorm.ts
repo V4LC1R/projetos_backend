@@ -58,9 +58,7 @@ export class ScheduleRepositoryTypeORM implements IScheduleRepository {
         await this.ormRepo.update(
             {id:In(schedules)},
             {
-                event:{id:eventId},
-                status:AvailabilityStatus.RESERVED,
-                active:ActiveStatusEnum.ACTIVE
+                event:{id:eventId}
             }
         );
         const schedulesUpdated = await this.ormRepo.findBy({id:In(schedules),active:ActiveStatusEnum.ACTIVE})

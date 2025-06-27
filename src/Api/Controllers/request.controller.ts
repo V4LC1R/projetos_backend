@@ -54,4 +54,11 @@ export class RequestController {
             .requestService
             .reject(id,req.user.id);
     }
+
+    @Delete('/:id')
+    async delete(@Param('id') id) {
+        return await this
+            .requestService
+            .delete(id);
+    }
 }

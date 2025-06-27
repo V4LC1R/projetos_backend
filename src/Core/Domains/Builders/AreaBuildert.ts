@@ -82,7 +82,6 @@ export class AreaBuilder {
   }
 
   static fill(input:AreaCreateInput){
-    console.log('<><>?',input.rent)
     return new AreaBuilder()
       .setName(input.name)
       .setRent(input.rent)

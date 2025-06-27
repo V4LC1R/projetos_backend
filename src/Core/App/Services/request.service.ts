@@ -8,6 +8,7 @@ import { ScheduleBuilder } from "@domain/Builders/ScheduleBuilder";
 import { IScheduleRepository } from "@domain/Repositories/schedule.repository";
 import { IEventRepository } from "@domain/Repositories/event.repository";
 import { EventModel, EventTypeEnum } from "@domain/Models/event.model";
+import { ScheduleModel } from "@domain/Models/schedule.model";
 
 export class RequestService {
     constructor(
@@ -26,7 +27,7 @@ export class RequestService {
         if(!area || !guest)
             throw new Error("Area or guest not found!")
 
-        const schedules = data.schedules.map(e=>new ScheduleBuilder().fill({id:e}))
+        const schedules = data.schedules.map(e=> {return {id:e} as ScheduleModel})
 
         const requestModel = new RequestModel(data.message)
             .setNameEvent(data.nameEvent ?? "S/N")

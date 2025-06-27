@@ -30,11 +30,16 @@ static toORM(domain: ScheduleModel): Schedule {
 
   if (domain.id) orm.id = domain.id;
 
-  orm.start_time = ScheduleMapper.formatToDate(domain.start_time);
-  orm.end_time = ScheduleMapper.formatToDate(domain.end_time);
-  orm.date = ScheduleMapper.formatToDate(domain.date);
+  if(domain.start_time)
+    orm.start_time = ScheduleMapper.formatToDate(domain.start_time);
+  if(domain.end_time)
+    orm.end_time = ScheduleMapper.formatToDate(domain.end_time);
+  if(domain.start_time)
+    orm.date = ScheduleMapper.formatToDate(domain.date);
 
-  orm.status = orm.status ?? AvailabilityStatus.AVAILABLE;
+  if(orm.status)
+    orm.status = orm.status ?? AvailabilityStatus.AVAILABLE;
+  
   orm.area = { id: domain.areaId } as Area;
 
   if(domain.eventId)

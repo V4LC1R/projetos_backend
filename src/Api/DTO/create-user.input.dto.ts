@@ -14,8 +14,5 @@ export class CreateUserInputDTO  {
     password: string;
 
     @IsNotEmpty()
-    @Matches(/^\(\d{2}\)\s9\d{4}-\d{4}$/, {
-        message: 'Telefone inválido. Exemplo válido: (11) 91234-5678',
-    })
     cellphone: string;
 }

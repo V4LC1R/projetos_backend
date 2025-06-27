@@ -1,5 +1,5 @@
 
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { AreaWithDistanceAndAvailability, IAreaRepository } from '@domain/Repositories/area.repository';
 import { Area } from '../Schemas/area.schema';
 import { IUserRepository } from '@domain/Repositories/user.repository';
@@ -21,7 +21,6 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
     async create(data:AreaModel):Promise<AreaModel>{
         
         const model = AreaMapper.toORM(data);
-        console.log('>>',model)
         const area =  await this.ormRepo.save(model)
         return AreaMapper.toDomain(area)
     }  
@@ -46,17 +45,23 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
     }
 
     async findById(id: number): Promise<AreaModel | null> {
-        const area = await this.ormRepo.findOne({
-            relations: { address: true,owner: true,categories:true,schedule:true },
-            where:{id,active:ActiveStatusEnum.ACTIVE},
-            order:{id:'desc'}
-        });
-        
-        if(!area)
-            return null;
-        
-        return AreaMapper.toDomain(area)
-    }
+        const area = await this.ormRepo
+            .createQueryBuilder('area')
+            .leftJoinAndSelect('area.address', 'address')
+            .leftJoinAndSelect('area.owner', 'owner')
+            .leftJoinAndSelect('area.categories', 'categories')
+            .leftJoinAndSelect('area.schedule', 'schedule')
+            .where('area.id = :id', { id })
+            .andWhere('area.active = :active', { active: ActiveStatusEnum.ACTIVE })
+            .andWhere('schedule.active = :scheduleActive', { scheduleActive: ActiveStatusEnum.ACTIVE })
+            .andWhere('schedule.eventId IS NULL')
+          .orderBy('area.id', 'DESC')
+          .getOne();
+
+        if (!area) return null;
+      
+        return AreaMapper.toDomain(area);
+      }
 
     async findAll(): Promise<AreaModel[]> {
         const areas = await this.ormRepo.find({order:{id:'desc'}});
@@ -114,6 +119,7 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
                     .andWhere("s.active = :activeStatus")
                     .andWhere("s.eventId IS NULL");
             }, "availableSchedules")
+           
             .where("areas.active = :activeStatus")
             .andWhere(`
                 (
@@ -124,6 +130,17 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
                     )
                 ) < :distance
             `)
+              .andWhere(qbSub => {
+                    return qbSub
+                    .subQuery()
+                    .select("COUNT(*)")
+                    .from("schedule", "s")
+                    .where("s.areaId = areas.id")
+                    .andWhere("s.status = :availableStatus")
+                    .andWhere("s.active = :activeStatus")
+                    .andWhere("s.eventId IS NULL")
+                    .getQuery() + " > 0";
+                })
             .orderBy("distance", "ASC")
             .distinct(true);
 

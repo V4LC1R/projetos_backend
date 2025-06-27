@@ -12,7 +12,7 @@ export class RequestRepositoryTypeORM implements IRequestRepository {
 
     async create(data:RequestModel):Promise<RequestModel>{
         const model = RequestMapper.toORM(data)
-
+        console.log(model)
         const request =  await this.ormRepo.save(model);
         return RequestMapper.toDomain(request);
     }  
@@ -59,6 +59,7 @@ export class RequestRepositoryTypeORM implements IRequestRepository {
             },
             where:{
                 area:{
+                    active:ActiveStatusEnum.ACTIVE,
                     owner:{id:ownerAreaId}
                 }
             }
@@ -75,6 +76,7 @@ export class RequestRepositoryTypeORM implements IRequestRepository {
                 area:true
             },
             where:{
+                active:ActiveStatusEnum.ACTIVE,
                 area:{
                     id:areaId,
                     owner:{id:ownerId}
@@ -90,10 +92,11 @@ export class RequestRepositoryTypeORM implements IRequestRepository {
             relations:{
                 owner:true,
                 schedules:true,
-                area:{schedule:false,categories:true},
+                area:{schedule:false,categories:true,address:true},
             },
             where:{
-               owner:{id:ownerId}
+                active:ActiveStatusEnum.ACTIVE,
+                owner:{id:ownerId}
             }
         })
 
@@ -125,7 +128,6 @@ export class RequestRepositoryTypeORM implements IRequestRepository {
 
     async rejectRequest(requestId: number): Promise<boolean> {
         const {affected} = await this.ormRepo.update(requestId,{status:StatusRequestEnum.REJECT})
-        console.log(requestId,affected)
         return affected ? affected > 0 :false
     }
 
