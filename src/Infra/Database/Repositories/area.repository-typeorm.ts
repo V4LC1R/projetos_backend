@@ -41,12 +41,13 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
     }
 
     async delete(id: number): Promise<boolean> {
-        return !await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
+        const {affected}= await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
+        return affected ? affected > 0 : false;
     }
 
     async findById(id: number): Promise<AreaModel | null> {
         const area = await this.ormRepo.findOne({
-            relations: { address: true,owner: true,categories:true },
+            relations: { address: true,owner: true,categories:true,schedule:true },
             where:{id,active:ActiveStatusEnum.ACTIVE},
             order:{id:'desc'}
         });
@@ -65,7 +66,7 @@ export class AreaRepositoryTypeORM implements IAreaRepository {
     async findByOwnerId(ownerId: number): Promise<AreaModel[]> {
 
         const areas = await this.ormRepo.find({
-            relations: { address: true,owner:true,categories:true},
+            relations: { address: true,owner:true,categories:true,schedule:true },
             where: { owner:{id:ownerId} ,active:ActiveStatusEnum.ACTIVE},
             order:{id:'desc'}
         });

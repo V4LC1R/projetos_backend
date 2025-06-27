@@ -25,6 +25,10 @@ export class RequestMapper {
       model.setSchedule(event.schedules.map(s => ScheduleMapper.toDomain(s)));
     }
 
+    model
+      .setStatus(event.status)
+      .setNameEvent(event.nameEvent || "S/N"); // Default value if not provided
+
     return model;
   }
 
@@ -33,6 +37,8 @@ export class RequestMapper {
 
     entity.id = domain.id;
     entity.message = domain.message;
+    entity.nameEvent = domain.nameEvent || "S/N"; // Default value if not provided
+    entity.status = domain.status;
     entity.createdAt = new Date(); // ou manter null e deixar o TypeORM criar
     entity.updatedAt = new Date();
 

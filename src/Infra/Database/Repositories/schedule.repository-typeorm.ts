@@ -29,7 +29,8 @@ export class ScheduleRepositoryTypeORM implements IScheduleRepository {
     }
 
     async delete(id: number): Promise<boolean> {
-        return !await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
+        const {affected} = await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
+        return affected ? affected > 0 : false;
     }
 
     async findById(id: number): Promise<ScheduleModel | null> {
@@ -81,9 +82,12 @@ export class ScheduleRepositoryTypeORM implements IScheduleRepository {
         return validate <= 0
     }
 
-    async releaseSchedules(schedules: number[]): Promise<boolean> {
-        const {affected} = await this.ormRepo.update(schedules,{status:AvailabilityStatus.AVAILABLE});
-        return affected ? affected > 0 : false
-    }
+    async releaseSchedulesByEvent(eventId: number): Promise<boolean> {
+        const { affected } = await this.ormRepo.update(
+          { event: { id: eventId } }, // WHERE
+          { event: null as any}             // SET
+        );
+        return affected ? affected > 0 : false;
+      }
         
 }

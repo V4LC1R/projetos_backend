@@ -23,7 +23,7 @@ export class EventAreaService {
             throw new Error("Err to create event!")
 
         const eventModel = new EventModel(data.name,data.type)
-            .setArea(area.id)
+            .setArea(area)
             .setGuest(guest.guestId)
         const event = await this.eventRepo.create(eventModel)
 
@@ -61,6 +61,8 @@ export class EventAreaService {
 
         if(!await this.eventRepo.delete(eventId))
             throw new Error("Error in delete event")
+
+        await this.scheduleRepo.releaseSchedulesByEvent(eventId)
 
         return {
             "message":"Event was deleted",

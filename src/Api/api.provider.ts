@@ -80,10 +80,22 @@ const coreServices = [
         }
     },
     {
-        inject:[RequestRepositoryTypeORM,AreaRepositoryTypeORM,UserRepositoryTypeORM],
+        inject:[
+            RequestRepositoryTypeORM,
+            AreaRepositoryTypeORM,
+            UserRepositoryTypeORM,
+            EventRepositoryTypeORM,
+            ScheduleRepositoryTypeORM
+        ],
         provide:RequestService,
-        useFactory:(mainRepo:RequestRepositoryTypeORM,areaRepo:AreaRepositoryTypeORM,userRepo:UserRepositoryTypeORM)=>{
-            return new RequestService(mainRepo,areaRepo,userRepo)
+        useFactory:(
+            mainRepo:RequestRepositoryTypeORM,
+            areaRepo:AreaRepositoryTypeORM,
+            userRepo:UserRepositoryTypeORM,
+            eventRepo:EventRepositoryTypeORM,
+            scheduleRepo:ScheduleRepositoryTypeORM
+        )=>{
+            return new RequestService(mainRepo,eventRepo,areaRepo,userRepo,scheduleRepo)
         }
     },
 ]

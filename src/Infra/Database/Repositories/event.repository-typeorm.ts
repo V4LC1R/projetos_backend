@@ -28,11 +28,19 @@ export class EventRepositoryTypeORM implements IEventRepository {
     }
 
     async delete(id: number): Promise<boolean> {
-        return !await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
+        const {affected} = await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
+        return affected ? affected > 0 : false;
     }
 
     async findById(id: number): Promise<EventModel | null> {
-        const event = await this.ormRepo.findOne({where:{id,active:ActiveStatusEnum.ACTIVE}});
+        const event = await this.ormRepo.findOne(
+            {
+                relations:{schedules:true,owner:true,area:true},
+                where:{
+                    id,active:ActiveStatusEnum.ACTIVE
+                }
+            }
+        );
         if(!event)
             return null;
 
@@ -91,7 +99,7 @@ export class EventRepositoryTypeORM implements IEventRepository {
         const events = await this
             .ormRepo
             .find({
-                relations:{schedules:true},
+                relations:{schedules:true,owner:true,area:{address:true}},
                 where:{
                     owner:{id:organizerId,active:ActiveStatusEnum.ACTIVE},
                     active:ActiveStatusEnum.ACTIVE

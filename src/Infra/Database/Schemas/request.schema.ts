@@ -23,6 +23,9 @@ export class Request {
     @Column({ type: 'text'})
     message: string;
 
+    @Column({ type: 'text',nullable:true,default: "S/N" })
+    nameEvent: string;
+
     @Column({ type: 'int' ,default:ActiveStatusEnum.ACTIVE})
     active:ActiveStatusEnum
 

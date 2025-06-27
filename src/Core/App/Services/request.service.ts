@@ -6,12 +6,16 @@ import { IUserRepository } from "@domain/Repositories/user.repository";
 import { RequestModel } from "@domain/Models/request.model";
 import { ScheduleBuilder } from "@domain/Builders/ScheduleBuilder";
 import { IScheduleRepository } from "@domain/Repositories/schedule.repository";
+import { IEventRepository } from "@domain/Repositories/event.repository";
+import { EventModel, EventTypeEnum } from "@domain/Models/event.model";
 
 export class RequestService {
     constructor(
         private readonly requestRepo:IRequestRepository,
+        private readonly eventRepo:IEventRepository,
         private readonly areaRepo:IAreaRepository,
         private readonly userRepo:IUserRepository,
+        private readonly scheduleRepo:IScheduleRepository
     ){}
 
     async create(data:RequestCreateInput){
@@ -25,6 +29,7 @@ export class RequestService {
         const schedules = data.schedules.map(e=>new ScheduleBuilder().fill({id:e}))
 
         const requestModel = new RequestModel(data.message)
+            .setNameEvent(data.nameEvent ?? "S/N")
             .setArea(area)
             .setGuest(guest)
             .setSchedule(schedules)
@@ -67,6 +72,20 @@ export class RequestService {
     async acept(requestId:number,ownerAreaId:number){
          //validar se o dono da area esta realizando o acept
         await this.requestRepo.aceptRequest(requestId)
+        const request = await this.requestRepo.findById(requestId);
+
+        if(!request || !request.area && !request.owner || !request.owner.id )
+            throw new Error("Request not found")
+
+        
+        const event = new EventModel(request.nameEvent,EventTypeEnum.SIMPLE)
+            .setArea(request.area)
+            .setGuest(request.owner.id)
+            .setSchedule(request.schedule)
+
+        await this.scheduleRepo.addSchedulesInEvent(event.id,request.schedule.map(s=>s.id))
+
+        await this.eventRepo.create(event)
         return {
             "message":"Request was acept"
         }

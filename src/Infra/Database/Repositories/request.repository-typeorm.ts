@@ -28,13 +28,14 @@ export class RequestRepositoryTypeORM implements IRequestRepository {
     }
 
     async delete(id: number): Promise<boolean> {
-        return !await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
+        const {affected} = await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
+        return affected ? affected > 0 : false;
     }
 
     async findById(id: number): Promise<RequestModel | null> {
         const request = await this.ormRepo.findOne(
             {
-                relations:{schedules:true},
+                relations:{schedules:true,owner:true,area:true},
                 where:{id,active:ActiveStatusEnum.ACTIVE}
             }
         );
@@ -117,15 +118,15 @@ export class RequestRepositoryTypeORM implements IRequestRepository {
     }
 
     async aceptRequest(requestId: number): Promise<boolean> {
-        const {generatedMaps} = await this.ormRepo.update(requestId,{status:StatusRequestEnum.ACEPT})
+        const {affected} = await this.ormRepo.update(requestId,{status:StatusRequestEnum.ACEPT})
 
-        return generatedMaps.length > 0
+        return affected ? affected > 0 :false
     }
 
     async rejectRequest(requestId: number): Promise<boolean> {
-        const {generatedMaps} = await this.ormRepo.update(requestId,{status:StatusRequestEnum.REJECT})
-
-        return generatedMaps.length > 0
+        const {affected} = await this.ormRepo.update(requestId,{status:StatusRequestEnum.REJECT})
+        console.log(requestId,affected)
+        return affected ? affected > 0 :false
     }
 
 }

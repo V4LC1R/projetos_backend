@@ -40,8 +40,8 @@ export class UserRepositoryTypeORM implements IUserRepository {
     }
 
     async delete(id: number): Promise<boolean> {
-        const { generatedMaps } =await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
-        return generatedMaps.length > 0
+        const { affected } = await this.ormRepo.update(id,{active:ActiveStatusEnum.INACTIVE});
+        return affected ? affected > 0 : false;
     }
 
     async findById(id: number): Promise<UserModel | null> {

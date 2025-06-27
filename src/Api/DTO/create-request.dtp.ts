@@ -7,6 +7,10 @@ export class CreateRequestInputDTO {
   @IsNotEmpty()
   message: string;
 
+  @IsString()
+  @IsNotEmpty()
+  nameEvent: string;
+
   @Type(() => Number)
   @IsInt()
   @IsNotEmpty()

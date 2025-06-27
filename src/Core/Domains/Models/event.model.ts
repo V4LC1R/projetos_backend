@@ -1,3 +1,4 @@
+import { AreaModel } from "./area.model";
 import { ScheduleModel } from "./schedule.model";
 
 export enum EventTypeEnum{
@@ -14,7 +15,7 @@ export enum EventStatusEnum{
 export class EventModel {
     id:number;
     name:string
-    areaId:number
+    area:AreaModel
     guestId:number
     type:EventTypeEnum
     schedule:ScheduleModel[]
@@ -37,8 +38,8 @@ export class EventModel {
         return this
     }
 
-    setArea(areaId: number){
-        this.areaId = areaId
+    setArea(area: AreaModel){
+        this.area = area
         return this;
     }
 

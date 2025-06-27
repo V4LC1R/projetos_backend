@@ -1,3 +1,4 @@
+import { AreaMapper } from './AreaMapper';
 import { EventModel } from "@domain/Models/event.model";
 import { Event } from "../Schemas/event.schema";
 import { ScheduleMapper } from "./ScheduleMapper";
@@ -12,12 +13,14 @@ export class EventMapper {
       model.setId(event.id)
 
     if (event.area) {
-      model.setArea(event.area.id);
+      model.setArea(AreaMapper.toDomain(event.area));
     }
 
     if (event.owner) {
       model.setGuest(event.owner.id);
     }
+
+    console.log(event.schedules)
 
     if (event.schedules && event.schedules.length > 0) {
       model.setSchedule(event.schedules.map(s => ScheduleMapper.toDomain(s)));
@@ -35,8 +38,12 @@ export class EventMapper {
     entity.createdAt = new Date(); // ou manter null e deixar o TypeORM criar
     entity.updatedAt = new Date();
 
-    if (domain.areaId) {
-      entity.area = {id:domain.areaId} as Area;
+    if (domain.schedule && domain.schedule.length > 0) {
+      entity.schedules = domain.schedule.map(s => ScheduleMapper.toORM(s));
+    }
+
+    if (domain.area) {
+      entity.area = {id:domain.area.id} as Area;
     }
 
     if (domain.guestId) {

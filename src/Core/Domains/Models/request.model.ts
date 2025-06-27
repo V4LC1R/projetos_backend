@@ -15,6 +15,8 @@ export class RequestModel {
     area:AreaModel
     owner:UserModel
     schedule:ScheduleModel[]
+    status:StatusRequestEnum
+    nameEvent:string;
 
     constructor(
         message:string,
@@ -39,6 +41,16 @@ export class RequestModel {
 
     setGuest(owner: UserModel){
         this.owner = owner
+        return this;
+    }
+
+    setStatus(status: StatusRequestEnum){
+        this.status = status
+        return this;
+    }
+
+    setNameEvent(nameEvent: string){
+        this.nameEvent = nameEvent;
         return this;
     }
 }
